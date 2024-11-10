@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK</title>
+</head>
+<style>
+    *{padding: 0;margin: 0;}
+    body{
+        background: #555;
+    }
+    .mainpanel{
+        width: 1081px;
+        height: 721px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 15px;
+        border: 1px solid black;
+        box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.75);
+        overflow: hidden;
+    }
+    .toptitle{
+        position: relative;
+        display: flex;
+        background-color: #333;
+        padding: 5px 0;
+        border-bottom: 3px solid #555;
+    }
+    .toptitle a{
+        position: relative;
+        text-decoration: none;
+        padding: 3px 25px;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        background-color: #333;
+        color: #fff;
+    }
+    .titlemark{
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 100%;
+        width: 86px;
+        border-bottom: 5px solid #00AEff;
+        background: linear-gradient(0deg,#00aeff33,transparent);
+        transition:  0.25s;
+        pointer-events: none;
+        filter: drop-shadow(0 5px 25px #00AEff);
+    }
+    .toppanel{
+        display: block;
+    }
+    .toppanel div{
+        display: flex;
+        height: 80px;
+        background-color: #333;
+        border-bottom: 3px solid #555;
+    }
+    
+    /* 
+    background-color: #00AEff10; 
+    */
+    .toppaneldiv{
+        color: #00AEff;
+        height: 100%;
+        width: 86px;
+        display: block;
+        position: relative;
+        cursor: pointer;
+        font-size: .8em;
+    }
+    .toppaneldiv:hover{
+        background-color: #ffffff05;
+    }
+
+    .toppaneldiv div::after{
+        position: absolute;
+        bottom: 3px;
+        content: var(--sn);
+        color: #fff;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .bt{
+        color: #fff;
+        width: 220px;
+        background:rgba(255, 255, 255, .2);
+        border: none;
+        padding: 2px 10px;
+        border-radius: 35px;
+        border: 1px solid rgba(255, 255, 255, .5);
+        border-right: 1px solid rgba(255, 255, 255, .2);
+        border-bottom: 1px solid rgba(255, 255, 255, .2);
+        font-size: 16px;
+        box-shadow: 0 5px 15px rgba(255, 255, 255, .1);
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    .bt:hover{
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(255, 255, 255, 0.3);
+    }
+
+    .msgbox{
+        position: absolute;
+        display: block;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #00000033;
+        
+    }
+    .msgpanel{
+        position: absolute;
+        width: 300px;
+        height: 200px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #000;
+    }
+    .msgset{
+        position: absolute;
+        width: 100%;
+        height: 163px;
+        color: #fff;
+        margin: 10px;
+    }
+
+    .contorpanel{
+        position: relative;
+        display: flex;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 500px;
+        background-color: #333;
+    }
+
+    .leftpanel{
+        position: relative;
+        display: flex;
+        min-width: 200px;
+        height: 100%;
+        background-color: #333;
+        border: 1px solid #555;
+    }
+    .leftpaneltitle{
+        position: absolute;
+        width: 100%;
+        height: 32px;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        background-color: #00000020;
+        border-bottom: 1px solid #333;
+        color: #fff;
+        text-align: left;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .leftpanelfoot{
+        position: absolute;
+        width: 100%;
+        height: 120px;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        background-color: #00000020;
+        border-bottom: 1px solid #333;
+        color: #fff;
+    }
+    .leftpanelfoot div{
+        margin: 10px;
+    }
+
+    .rightpanel{
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-color: #333;
+        border: 1px solid #555;
+    }
+
+    .bottompanel{
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-color: #333;
+        border: 1px solid #555;
+    }
+    .devicetag{
+        height: 20px;
+        width: 100%;
+    }
+    .devicetag:hover{
+        filter: drop-shadow(0 5px 15px #fff);
+    }
+    .devicetag::after{
+        content: var(--sn);
+        color: #fff;
+        font-size: 0.9em;
+        border-left: 5px solid #555;
+    }
+    .devicetagsel::after{
+        border-left: 5px solid #00AEff;
+        color: #00AEff;
+        filter: drop-shadow(0 5px 25px #00AEff);
+    }
+</style>
+<body>
+    <div class="mainpanel">
+        <div class="toptitle">
+            <a href="#" onclick="moveselect(this);toppanelitem.style.top='0px'">菜单</a>
+            <a href="#" onclick="moveselect(this);toppanelitem.style.top='-83px'">功能</a>
+            <a href="#" onclick="moveselect(this);toppanelitem.style.top='-166px'">其他</a>
+            <a href="#" onclick="moveselect(this);toppanelitem.style.top='-249px'">工具</a>
+            <div></div>
+            <div class="titlemark"></div>
+        </div>
+        <div style="position: relative; width: 100%;height: 80px;overflow: hidden;">
+            <div id="toppanelitem" style="position: absolute; width: 100%;top:0;transition: 0.1s;">
+
+                    
+                
+                <div class="toppanel">
+                    <div style="display: flex;">
+                        <div class="toppaneldiv" onclick="msgbox.style.display='block'"><div style="--sn:'连接'"></div></div>
+                        <div style="height: 100%;width: 2px;background-color: #444;"></div>
+                        <div class="toppaneldiv"><div style="--sn:'使能'"></div></div>
+                        <div class="toppaneldiv"><div style="--sn:'失能'"></div></div>
+                        <div class="toppaneldiv"><div style="--sn:'回零'"></div></div>
+                        <div class="toppaneldiv"><div style="--sn:'校准'"></div></div>
+                        <div class="toppaneldiv"><div style="--sn:'清除报警'"></div></div>
+                        <div style="margin-left: auto;width: 258px;display: flex;">
+                            <div class="toppaneldiv"><div style="--sn:'默认参数'"></div></div>
+                            <div class="toppaneldiv"><div style="--sn:'保存参数'"></div></div>
+                            <div class="toppaneldiv"><div style="--sn:'固件升级'"></div></div>
+                        </div>
+                    </div>
+                    <div style="display: flex;">
+                        <div class="toppaneldiv" onclick="msgbox.style.display='block'"><div style="--sn:'下载配置文件'"></div></div>
+                        
+                    </div>
+                    <div style="display: flex;">
+
+                    </div>
+                    <div style="display: flex;">
+                        <div class="toppaneldiv" onclick="msgbox.style.display='block'"><div style="--sn:'进制转换'"></div></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="contorpanel">
+            <div class="leftpanel">
+                <div class="leftpaneltitle"><div style="margin-left: 10px;">设备列表</div></div>
+                
+                <div style="position: absolute; display: block; height: 320px;top: 30px;width: 100%; overflow: hidden;">
+                    <div onclick="movediv(this,'fp');selectmark(this,'devicetagsel')" style="--sn:'1号设备'" class="devicetag devicetagsel"></div>
+                    <div fp="" style="display: flex;">
+                        <div style="width: 20px;"></div>
+                        <div style="display: block;width: 100%;">
+                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'参数设置'"
+                                class="devicetag devicetagsel"></div>
+                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'位置模式'" class="devicetag"></div>
+                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'扭矩位置模式'" class="devicetag"></div>
+                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'探测模式'" class="devicetag"></div>
+                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'电爪模式'" class="devicetag"></div>
+                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'互联模式'" class="devicetag"></div>
+                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'液位传感器设置'" class="devicetag"></div>
+                        </div>
+                    </div>
+                    <div onclick="movediv(this,'fp');selectmark(this,'devicetagsel')" style="--sn:'2号设备'" class="devicetag"></div>
+                </div>
+
+                <div class="leftpanelfoot">
+                    <div>设备信息</div>
+                    <div style="display: flex;font-size: 0.8em;">设备ID
+                        <input type="text" style="outline: none;border: 1px solid #555; background-color: transparent; margin-left: 10px;width: 30px;color: #fff;"  value="1"/>
+                        <button style="font-size: .7em;margin-left: 3px;">修改</button>
+                    </div>
+                    <div style="display: flex;font-size: 0.8em;">设备类型
+                        <input type="text" style="outline: none;border: 1px solid #555; background-color: transparent; margin-left: 10px;margin-top: -0px;width: 30px;color: #fff;"  value="1"/>
+                    </div>
+                    <span style="font-size: 1em;">状态: 未连接</span>
+                </div>
+            </div>
+            <div class="rightpanel">
+                <div class="leftpaneltitle"><div style="margin-left: 10px;">设备信息</div></div>
+                <div></div>
+            </div>
+        </div>
+        <div class="bottompanel">
+            <div style="display: flex;">
+
+                <div style="width: 95%;">
+                    <input type="text" name="inputtext" id="inputtext" style="margin: 5px;width: 100%;">
+                    <textarea name="outputtext" id="outputtext" style="margin: 5px;width: 100%;height: 100px;"></textarea>
+                </div>
+                <div style="display: block;position: absolute;right: 0;margin: 5px;">
+                    <button style="margin-bottom: 10px;">发送</button>
+                    <br>
+                    <button>清空</button>
+                </div>
+            </div>
+        </div>
+        <div id="msgbox" class="msgbox">
+            <div style="width: 100%;height: 100%;" onclick="this.parentElement.style.display='none';"></div>
+            <div class="msgpanel">
+                <div class="toptitle">
+                    <a href="#" onclick="moveselect(this);comselect.style.display='block';canselect.style.display='none';">串口</a>
+                    <a href="#" onclick="moveselect(this);comselect.style.display='none';canselect.style.display='block';">CAN</a>
+                    <span style="position: absolute;right: 5px; float: right;color: #fff;cursor: pointer;"
+                        onclick="this.parentElement.parentElement.parentElement.style.display='none';">×</span>
+                    <div class="titlemark"></div>
+                </div>
+                <div id="comselect" class="msgset" style="display: block;">
+                    <div style="display: flex;">
+                        <span>串口波特率</span>
+                        <select id="bpsselect" style="border: 0px;background-color: transparent;color: #777;">
+                            <option>1200</option>
+                            <option>2400</option>
+                            <option>4800</option>
+                            <option>9600</option>
+                            <option>14400</option>
+                            <option>19200</option>
+                            <option>38400</option>
+                            <option>57600</option>
+                            <option selected>115200</option>
+                            <option>128000</option>
+                            <option>230400</option>
+                            <option>256000</option>
+                            <option>460800</option>
+                            <option>512000</option>
+                            <option>921600</option>
+                            <option>1500000</option>
+                            <option>2000000</option>
+                        </select>
+                    </div>
+                    <div style="position: absolute;right: 20px;bottom: 20px;">
+                        <button style="width: 90px;height: 60px;">选择串口</button>
+                    </div>
+                </div>
+
+
+                <div class="msgset" id="canselect" style="display: none;">
+                    <div style="display: flex;margin-bottom: 10px;">
+                        <span>CAN选择</span>
+                        <select id="bpsselect" style="border: 0px;background-color: transparent;color: #777;">
+                            <option selected>SKCOM</option>
+                        </select>
+                    </div>
+                    <div style="display: flex;">
+                        <span>CAN速率</span>
+                        <select id="bpsselect" style="border: 0px;background-color: transparent;color: #777;">
+                            <option selected>1000</option>
+                            <option>600</option>
+                            <option>500</option>
+                            <option>300</option>
+                            <option>250</option>
+                            <option>150</option>
+                            <option>125</option>
+                            <option>100</option>
+                            <option>75</option>
+                            <option>50</option>
+                            <option>25</option>
+                            <option>10</option>
+                        </select>
+                    </div>
+                    <div style="position: absolute;right: 20px;bottom: 20px;">
+                        <button style="width: 90px;height: 60px;">选择CAN</button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    function moveselect(e){
+        let parent = e.parentElement;
+        let lastChild = parent.lastElementChild;
+        lastChild.style.left = e.offsetLeft + 'px';
+        lastChild.style.width = e.offsetWidth + 'px';
+    }
+    function selectmark(e,name){
+        if (e.classList.contains(name))return;
+        let parentDiv = e.parentElement;
+        Array.from(parentDiv.children).forEach(child => {
+            if (child.classList.contains(name)) {
+                child.classList.remove(name);
+            }
+        });
+        e.classList.add(name);
+    }
+    function movediv(e,name){
+        let parent = e.parentElement;
+        if (!parent[name]) {
+            let foundDiv = Array.from(parent.children).find(child => child.getAttribute(name) !== null);
+            parent[name]=foundDiv;
+        }
+        let nextDiv = e.nextElementSibling;
+        parent[name].remove();
+        if (nextDiv) {
+            parent.insertBefore(parent[name], nextDiv);
+        }
+        else {
+            parent.appendChild(parent[name]);
+        }
+        parent[name].children[1].children[0].click();
+    }
+    onload=()=>{
+        //moveselect(document.querySelector('toptitle'))
+    }
+</script>
+</html>
