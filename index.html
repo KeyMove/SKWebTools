@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -86,21 +86,43 @@
     }
     
     .bt{
+        border: 0;
+        margin: 2px;
+        padding: 3px;
+        background-color: #555;
         color: #fff;
-        width: 220px;
-        background:rgba(255, 255, 255, .2);
-        border: none;
-        padding: 2px 10px;
-        border-radius: 35px;
-        border: 1px solid rgba(255, 255, 255, .5);
-        border-right: 1px solid rgba(255, 255, 255, .2);
-        border-bottom: 1px solid rgba(255, 255, 255, .2);
-        font-size: 16px;
-        box-shadow: 0 5px 15px rgba(255, 255, 255, .1);
-        cursor: pointer;
-        margin-bottom: 10px;
+        transition: 0.2s;
     }
     .bt:hover{
+        cursor: pointer;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(255, 255, 255, 0.3);
+    }
+    
+
+    .bticon{
+        position: absolute;
+        border: 0;
+        margin: 2px;
+        
+        background-color: #555;
+        color: #fff;
+        width: 64px;
+        height: 64px;
+        transition: 0.2s;
+    }
+    .bticon::after{
+        position: absolute;
+        bottom: 3px;
+        content: var(--sn);
+        color: #fff;
+        width: 100%;
+        font-size: 0.6em;
+        text-align: center;
+    }
+    .bticon:hover{
+        cursor: pointer;
+        background-color: #777;
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.3),
         0 0 60px rgba(255, 255, 255, 0.3);
     }
@@ -151,7 +173,7 @@
         border: 1px solid #555;
     }
     .leftpaneltitle{
-        position: absolute;
+        position: relative;
         width: 100%;
         height: 32px;
         left: 50%;
@@ -186,6 +208,7 @@
         height: 100%;
         background-color: #333;
         border: 1px solid #555;
+        display: block;
     }
 
     .bottompanel{
@@ -199,9 +222,10 @@
     .devicetag{
         height: 20px;
         width: 100%;
+        
     }
     .devicetag:hover{
-        filter: drop-shadow(0 5px 15px #fff);
+        filter: drop-shadow(0 5px 15px #777);
     }
     .devicetag::after{
         content: var(--sn);
@@ -213,6 +237,54 @@
         border-left: 5px solid #00AEff;
         color: #00AEff;
         filter: drop-shadow(0 5px 25px #00AEff);
+    }
+
+    .pospanel span{
+        font-size: 0.8em;
+        position: absolute;
+    }
+    .pospanel input[type='text']{
+        font-size: 0.8em;
+        width: 100px;
+        position: absolute;
+        border: 1px solid #000;
+    }
+
+    .pospanel input[type='checkbox']{
+        font-size: 0.8em;
+        position: absolute;
+        border: 1px solid #000;
+    }
+    .pospanel select{
+        border: 1px solid #000;
+        font-size: .8em;
+        position: absolute;
+        width: 100px;
+    }
+    .pospanel input[type='range']{
+        font-size: 0.8em;
+        width: 100px;
+        position: absolute;
+        border: 1px solid #000;
+    }
+    /*
+    .pospanel input[type='range']::after{
+        content: var(--v);
+        position: absolute;
+        left: 105%;
+    }*/
+    .pospanel input[type='number']{
+        font-size: 0.8em;
+        width: 100px;
+        position: absolute;
+        border: 1px solid #000;
+        -moz-appearance: textfield; /* Firefox */
+        appearance: textfield;
+    }
+    .pospanel input[type='number']::-webkit-inner-spin-button,
+    .pospanel input[type='number']::-webkit-outer-spin-button{
+        -webkit-appearance: none;
+        margin: 0;
     }
 </style>
 <body>
@@ -234,14 +306,14 @@
                     <div style="display: flex;">
                         <div class="toppaneldiv" onclick="msgbox.style.display='block'"><div style="--sn:'连接'"></div></div>
                         <div style="height: 100%;width: 2px;background-color: #444;"></div>
-                        <div class="toppaneldiv"><div style="--sn:'使能'"></div></div>
-                        <div class="toppaneldiv"><div style="--sn:'失能'"></div></div>
+                        <div class="toppaneldiv" onclick="VarSet('Enable',1)"><div style="--sn:'使能'"></div></div>
+                        <div class="toppaneldiv" onclick="VarSet('Enable',0)"><div style="--sn:'失能'"></div></div>
                         <div class="toppaneldiv"><div style="--sn:'回零'"></div></div>
                         <div class="toppaneldiv"><div style="--sn:'校准'"></div></div>
                         <div class="toppaneldiv"><div style="--sn:'清除报警'"></div></div>
                         <div style="margin-left: auto;width: 258px;display: flex;">
                             <div class="toppaneldiv"><div style="--sn:'默认参数'"></div></div>
-                            <div class="toppaneldiv"><div style="--sn:'保存参数'"></div></div>
+                            <div onclick="VarSet('重启设备',1)" class="toppaneldiv"><div style="--sn:'重启设备'"></div></div>
                             <div class="toppaneldiv"><div style="--sn:'固件升级'"></div></div>
                         </div>
                     </div>
@@ -261,54 +333,167 @@
         </div>
         <div class="contorpanel">
             <div class="leftpanel">
-                <div class="leftpaneltitle"><div style="margin-left: 10px;">设备列表</div></div>
-                
-                <div style="position: absolute; display: block; height: 320px;top: 30px;width: 100%; overflow: hidden;">
-                    <div onclick="movediv(this,'fp');selectmark(this,'devicetagsel')" style="--sn:'1号设备'" class="devicetag devicetagsel"></div>
-                    <div fp="" style="display: flex;">
-                        <div style="width: 20px;"></div>
-                        <div style="display: block;width: 100%;">
-                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'参数设置'"
-                                class="devicetag devicetagsel"></div>
-                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'位置模式'" class="devicetag"></div>
-                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'扭矩位置模式'" class="devicetag"></div>
-                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'探测模式'" class="devicetag"></div>
-                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'电爪模式'" class="devicetag"></div>
-                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'互联模式'" class="devicetag"></div>
-                            <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'液位传感器设置'" class="devicetag"></div>
-                        </div>
+                <div class="leftpaneltitle" style="position: relative;">
+                    <div style="margin-left: 10px;">设备列表</div>
+                    <div style="width: 100%;display: flex;justify-content: flex-end;position: absolute;">
+                        <button onclick="devicelist.innerHTML='';ScanDevice()" class="bt">刷新</button>
                     </div>
-                    <div onclick="movediv(this,'fp');selectmark(this,'devicetagsel')" style="--sn:'2号设备'" class="devicetag"></div>
+                    
+                    
+                </div>
+                
+                <div id="submenu" fp="" style="display: none;">
+                    <div style="width: 20px;"></div>
+                    <div style="display: block;width: 100%;">
+                        <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'参数设置'"
+                            class="devicetag devicetagsel"></div>
+                        <!--
+                        <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'位置模式'" class="devicetag"></div>
+                        <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'扭矩位置模式'" class="devicetag"></div>
+                        <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'探测模式'" class="devicetag"></div>
+                        <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'电爪模式'" class="devicetag"></div>
+                        <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'互联模式'" class="devicetag"></div>
+                        <div onclick="selectmark(this,'devicetagsel')" style="font-size: 1.2em; --sn:'液位传感器设置'" class="devicetag"></div>
+                    -->
+                    </div>
+                </div>
+                <div id="devicelist" style="position: absolute; display: block; height: 320px;top: 30px;width: 100%; overflow: hidden;">
                 </div>
 
                 <div class="leftpanelfoot">
                     <div>设备信息</div>
-                    <div style="display: flex;font-size: 0.8em;">设备ID
-                        <input type="text" style="outline: none;border: 1px solid #555; background-color: transparent; margin-left: 10px;width: 30px;color: #fff;"  value="1"/>
-                        <button style="font-size: .7em;margin-left: 3px;">修改</button>
+                    <div style="display: flex;font-size: 0.8em;">设备ID<span style="margin-left: 12px;"></span> 
+                        <input id="infodevid" type="text" style="outline: none;border: 1px solid #555; background-color: transparent; margin-left: 10px;width: 30px;color: #fff;"  value="1"/>
+                        <button onclick="setnewid(infodevid.value|0)" style="font-size: .7em;margin-left: 3px;">修改</button>
                     </div>
                     <div style="display: flex;font-size: 0.8em;">设备类型
                         <input type="text" style="outline: none;border: 1px solid #555; background-color: transparent; margin-left: 10px;margin-top: -0px;width: 30px;color: #fff;"  value="1"/>
                     </div>
-                    <span style="font-size: 1em;">状态: 未连接</span>
+                    <span id="outputinfo" style="font-size: 1em;">状态: 未连接</span>
                 </div>
             </div>
+
             <div class="rightpanel">
-                <div class="leftpaneltitle"><div style="margin-left: 10px;">设备信息</div></div>
-                <div></div>
+                <div style="position: absolute;width: 100%;height: 100%;">
+                    <div class="leftpaneltitle">
+                        <div style="margin-left: 10px;">设备信息</div>
+                        <div style="width: 100%;display: flex;justify-content: flex-end;position: absolute;">
+                            <button onclick="ReadDevice()" class="bt">读取参数</button>
+                            <button onclick="WriteDevice()" class="bt">更新参数</button>
+                            <button onclick="VarSet('保存模式',1)" class="bt">保存参数</button>
+                        </div>
+                    </div>
+                    <div style="height: 100%;width: 100%;position: relative;">
+                        <div id="参数设置面板" class="pospanel" style="background-color: #fff;height: 100%;width: 100%;position: absolute;">
+                            <canvas id="posmaview" width="320" height="160" style="right: 2px;top: 3px;position: absolute; border: 1px solid #000;"></canvas>                            
+                            <span id="实时电流" format="实时电流: {0}" style="left: 553px;top: 163px;color: #f00;">实时电流: 0</span>
+                            <span id="实时位置" format="实时位置: {0}" style="left: 553px;top: 178px;color: #00f;">实时位置: 0</span>
+                            <span style="left: 5px;top: 10px;">工作模式</span>
+                            <span style="left: 130px;top: 10px">子程序</span>
+                            <select id="工作模式" style="left: 5px;top: 30px;">
+                                <option selected>扭矩位置模式</option>
+                                <option>位置模式</option>
+                            </select>
+                            <select id="子程序" style="left: 130px;top: 30px;">
+                                <option selected>程序0</option>
+                                <option>程序1</option>
+                                <option>程序2</option>
+                                <option>程序3</option>
+                                <option>程序4</option>
+                                <option>程序5</option>
+                            </select>
+                            <span style="left: 5px;top: 50px;">每圈脉冲数</span>
+                            <span style="left: 130px;top: 50px;">最大允许误差</span>
+                            <input type="number" style="left: 5px;top: 70px;" id="每圈脉冲数">
+                            <input type="number" style="left: 130px;top: 70px;" id="最大允许误差">
+
+                            <span style="left: 5px;top: 90px;">最大运行速度</span>
+                            <span style="left: 130px;top: 90px;">最大加速度</span>
+                            <input type="number" style="left: 5px;top: 110px;" id="最大速度">
+                            <input type="number" style="left: 130px;top: 110px;" id="最大加速度">
+
+                            <span style="left: 5px;top: 130px;">最大运行电流</span>
+                            <input type="number" style="left: 5px;top: 150px;" id="最大电流">
+
+                            <span style="left: 5px;top: 180px;">上电回零</span>
+                            <input type="checkbox" style="left: 105px;top: 183px;" id="上电回零">
+                            <span style="left: 5px;top: 195px;">能耗制动</span>
+                            <input type="checkbox" style="left: 105px;top: 198px;" id="能耗制动">
+                            <span style="left: 5px;top: 210px;">多圈使能</span>
+                            <input type="checkbox" style="left: 105px;top: 213px;" id="多圈">
+                            <span style="left: 5px;top: 225px;">回零传感器常开</span>
+                            <input type="checkbox" style="left: 105px;top: 228px;" id="回零传感器模式">
+                            
+
+                            <span style="left: 5px;top: 250px;">PID设置</span>
+                            <span style="left: 10px;top: 270px;">P</span>
+                            <span style="left: 10px;top: 290px;">I</span>
+                            <span style="left: 10px;top: 310px;">D</span>
+                            <input oninput="this.nextElementSibling.value=this.value" type="range" style="left: 30px;top: 270px;--v:'0';" max="255" min="0" value="0" id="Kp">
+                            <input oninput="this.previousElementSibling.value=this.value;this.value=this.previousElementSibling.value" type="number" style="left: 140px;top: 270px;width: 22px;" id="Kp_">
+                            <input oninput="this.nextElementSibling.value=this.value"  type="range" style="left: 30px;top: 290px;--v:'0';" max="255" min="0" value="0" id="Ki">
+                            <input oninput="this.previousElementSibling.value=this.value;this.value=this.previousElementSibling.value" type="number" style="left: 140px;top: 290px;width: 22px;" id="Ki_">
+                            <input oninput="this.nextElementSibling.value=this.value"  type="range" style="left: 30px;top: 310px;--v:'0';" max="255" min="0" value="0" id="Kd">
+                            <input oninput="this.previousElementSibling.value=this.value;this.value=this.previousElementSibling.value" type="number" style="left: 140px;top: 310px;width: 22px;" id="Kd_">
+
+                            <span style="left: 275px;top: 10px;">回零模式</span>
+                            <select cvt="true" oninput="this.selectedIndex=[23,27,-3 & 0xff, -4&0xff,37].indexOf(this.cvt|0);" style="left: 275px;top: 30px;" id="回零模式">
+                                <option selected>开关正向回零</option>
+                                <option>开关反向回零</option>
+                                <option>撞击正向回零</option>
+                                <option>撞击反向回零</option>
+                                <option>当前点回零</option>
+                            </select>
+                            <span style="left: 275px;top: 50px;">回零速度</span>
+                            <span style="left: 400px;top: 50px;">回零加速度</span>
+                            <input type="number" style="left: 275px;top: 70px;" id="回零速度">
+                            <input type="number" style="left: 400px;top: 70px;" id="回零加速度">
+                            <span style="left: 275px;top: 90px;">回零偏移</span>
+                            <span style="left: 400px;top: 90px;">回零电流</span>
+                            <input type="number" style="left: 275px;top: 110px;" id="回零偏移">
+                            <input type="number" style="left: 400px;top: 110px;" id="回零电流">
+                            <span style="left: 275px;top: 130px;">回零确认时间(100us)</span>
+                            <span style="left: 400px;top: 130px;">回零最大距离</span>
+                            <input type="number" style="left: 275px;top: 150px;" id="回零确认时间">
+                            <input type="number" style="left: 400px;top: 150px;" id="回零最大距离">
+
+                            <span style="left: 473px;top: 200px;">夹持电流</span>
+                            <span style="left: 683px;top: 200px;">松开电流</span>
+                            <span style="left: 473px;top: 230px;">夹持速度</span>
+                            <span style="left: 683px;top: 230px;">松开速度</span>
+                            <input oninput="this.nextElementSibling.value=this.value" type="range" style="left: 533px;top: 200px;" max="255" min="0" value="0" id="夹持电流">
+                            <input oninput="eventinput(this)" type="number" style="left: 643px;top: 200px;width: 22px;" id="夹持电流_">
+                            <input oninput="this.nextElementSibling.value=this.value" type="range" style="left: 743px;top: 200px;" max="255" min="0" value="0" id="松开电流">
+                            <input oninput="eventinput(this)" type="number" style="left: 850px;top: 200px;width: 22px;" id="松开电流_">
+                            <input oninput="this.nextElementSibling.value=this.value" type="range" style="left: 533px;top: 230px;" max="255" min="0" value="0" id="夹持速度">
+                            <input oninput="eventinput(this)" type="number" style="left: 643px;top: 230px;width: 22px;" id="夹持速度_">
+                            <input oninput="this.nextElementSibling.value=this.value" type="range" style="left: 743px;top: 230px;" max="255" min="0" value="0" id="松开速度">
+                            <input oninput="eventinput(this)" type="number" style="left: 850px;top: 230px;width: 22px;" id="松开速度_">
+                            
+                            <span style="left: 473px;top: 260px;">夹持确认时间</span>
+                            <input type="number" style="left: 473px;top: 280px;" id="夹持确认时间">
+                            <span style="left: 473px;top: 300px;">运行位置</span>
+                            <input type="number" style="left: 473px;top: 320px;" id="夹持目标位置">
+                            <div onclick="VarSet('松夹电爪',1)" class="bticon" style="right: 15px;top: 280px; --sn:'夹持'"></div>
+                            <div onclick="VarSet('松夹电爪',2)" class="bticon" style="right: 88px;top: 280px; --sn:'松开'"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            
+
         </div>
         <div class="bottompanel">
             <div style="display: flex;">
 
-                <div style="width: 95%;">
+                <div style="width: 95%;position: relative;">
                     <input type="text" name="inputtext" id="inputtext" style="margin: 5px;width: 100%;">
-                    <textarea name="outputtext" id="outputtext" style="margin: 5px;width: 100%;height: 100px;"></textarea>
+                    <textarea name="outputtext" id="outputtext" style="position: absolute;margin: 5px; width: 100%;height: 60px;top: 30px; resize: none;transition: 0.1s; overflow-y: scroll;" onmousewheel="if(document.activeElement !== this)return;if(event.deltaY < 0) {this.style.top='-150px';this.style.height='240px';}" onblur="this.style.top='30px';this.style.height='60px';"></textarea>
                 </div>
                 <div style="display: block;position: absolute;right: 0;margin: 5px;">
-                    <button style="margin-bottom: 10px;">发送</button>
+                    <button style="margin-bottom: 10px;" onclick="SendPacket(new TextEncoder().encode(inputtext.value))">发送</button>
                     <br>
-                    <button>清空</button>
+                    <button onclick="outputtext.value=''">清空</button>
                 </div>
             </div>
         </div>
@@ -316,8 +501,8 @@
             <div style="width: 100%;height: 100%;" onclick="this.parentElement.style.display='none';"></div>
             <div class="msgpanel">
                 <div class="toptitle">
-                    <a href="#" onclick="moveselect(this);comselect.style.display='block';canselect.style.display='none';">串口</a>
-                    <a href="#" onclick="moveselect(this);comselect.style.display='none';canselect.style.display='block';">CAN</a>
+                    <a href="#" onclick="if(PortOpen)return;moveselect(this);comselect.style.display='block';canselect.style.display='none';">串口</a>
+                    <a href="#" onclick="if(PortOpen)return;moveselect(this);comselect.style.display='none';canselect.style.display='block';">CAN</a>
                     <span style="position: absolute;right: 5px; float: right;color: #fff;cursor: pointer;"
                         onclick="this.parentElement.parentElement.parentElement.style.display='none';">×</span>
                     <div class="titlemark"></div>
@@ -346,7 +531,7 @@
                         </select>
                     </div>
                     <div style="position: absolute;right: 20px;bottom: 20px;">
-                        <button style="width: 90px;height: 60px;">选择串口</button>
+                        <button style="width: 90px;height: 60px;" onclick="openport(this,'uart',bpsselect.value,canselect)">选择串口</button>
                     </div>
                 </div>
 
@@ -354,13 +539,13 @@
                 <div class="msgset" id="canselect" style="display: none;">
                     <div style="display: flex;margin-bottom: 10px;">
                         <span>CAN选择</span>
-                        <select id="bpsselect" style="border: 0px;background-color: transparent;color: #777;">
+                        <select id="cantoolselect" style="border: 0px;background-color: transparent;color: #777;">
                             <option selected>SKCOM</option>
                         </select>
                     </div>
                     <div style="display: flex;">
                         <span>CAN速率</span>
-                        <select id="bpsselect" style="border: 0px;background-color: transparent;color: #777;">
+                        <select id="canbpsselect" style="border: 0px;background-color: transparent;color: #777;">
                             <option selected>1000</option>
                             <option>600</option>
                             <option>500</option>
@@ -376,7 +561,7 @@
                         </select>
                     </div>
                     <div style="position: absolute;right: 20px;bottom: 20px;">
-                        <button style="width: 90px;height: 60px;">选择CAN</button>
+                        <button style="width: 90px;height: 60px;" onclick="openport(this,cantoolselect.value,canbpsselect.value)">选择CAN</button>
                     </div>
                 </div>
 
@@ -386,6 +571,1789 @@
     </div>
 </body>
 <script>
+    class COMHelper{
+        constructor(onOpenClose,OnRecvData,OnRecvString,RecvTick=true){
+            this.OnStatusChange=onOpenClose?onOpenClose:(b,info)=>{};
+            this.OnRecvBytes=OnRecvData?OnRecvData:()=>{};
+            this.rxEnable=OnRecvString!=null;
+            this.bytesEnable=OnRecvData!=null;
+            this.OnRecvString=OnRecvString?OnRecvString:()=>{};
+            this.OnDataReceive=null;
+            this.COM=null;
+            this.COMReader=null;
+            this.COMWriter=null;
+            this.isOpen=false;
+            this.buffer=[];
+            this.COMInfo='';
+            this.rxCache=[];
+            this.IdleTime=0;
+            
+            this.rxThCount=0;
+            this.rxPromise=null;
+            this.rxPromiseresolve=null;
+            this.rxPromisereject=null;
+            this.rxPromisecallback=null;
+            if(RecvTick){
+                setInterval(()=>{
+                    if(this.buffer.length>=this.rxThCount)
+                    {
+                        this.OnRecvBytes(this.buffer);
+                        this.buffer=[];
+                    }
+                    if(this.IdleTime)
+                        if(--this.IdleTime==0)
+                        {
+                            if(this.buffer.length!=0){
+                                this.OnRecvBytes(this.buffer);
+                                this.buffer=[];
+                            }
+                        }
+                    if(this.rxCache.length>0){
+                        this.OnRecvString(this.rxCache.join(''));
+                        this.rxCache=[];
+                    }
+                },1);
+            }
+        }
+
+        getRxData(){
+            if(this.buffer.length!=0){
+                let values=this.buffer;
+                this.buffer=[];
+                return values;
+            }
+            return null;
+        }
+
+        waitThCount(call=()=>{}){
+            if(this.rxPromise)this.rxPromisereject();
+            this.rxPromise = new Promise((resolve, reject) => {
+                this.rxPromiseresolve=resolve;
+                this.rxPromisereject=reject;
+            });
+            this.rxPromisecallback=call;
+            return this.rxPromise;
+        }
+
+        async portSelect(){
+            await navigator.serial
+            .requestPort()
+            .then((port) => {
+                this.COM=port;
+                this.COMInfo=JSON.stringify(port.getInfo());
+            })
+            .catch((e) => {
+                this.COM=null;
+                console.log(e);
+                // The user didn't select a port.
+            });
+        }
+
+        async Open(baudRate=115200,partiy='none',databits=8,stopbits=1){
+            if(this.isOpen){
+                try {
+                    this.COMReader.releaseLock();
+                    this.COMWriter.releaseLock();
+                    await this.COM.close();
+                    //await COMReader.cancel();
+                } catch (e) {
+                    console.log(e);
+                    return false;
+                    //TODO handle the exception
+                }
+                this.buffer=[];
+                this.isOpen=false;
+                this.OnStatusChange(this.isOpen,this.COMInfo);
+                return false;
+            }
+            else{
+                await this.portSelect();
+                if(this.COM==null){
+                    console.log("打开串口失败");
+                    return false;
+                }
+            }
+            //配置串口信息
+            let cfg={
+                baudRate: baudRate,
+                parity: partiy,
+                dataBits: databits,
+                stopBits:stopbits,
+            }
+            console.log(cfg);
+            try{
+                await this.COM.open(cfg);
+            }catch(e){
+                console.log("打开串口失败");
+                this.OnStatusChange(this.isOpen,this.COMInfo);
+                return false;
+            }
+            this.COMReader = this.COM.readable.getReader();
+            this.COMWriter = this.COM.writable.getWriter();
+            
+            if(this.COMReader!=null){
+                this.isOpen=true;
+                this.OnStatusChange(this.isOpen,this.COMInfo);
+            }
+
+            try {
+                while (this.isOpen) {
+                    const { value, done } = await this.COMReader.read();
+                    if (done) {
+                        this.COMReader.releaseLock();
+                        break;
+                    }
+                    
+                    if (value) {
+                        if(this.OnDataReceive){
+                            value.forEach(e => this.buffer.push(e));
+                            this.OnDataReceive(this.buffer);
+                        }
+                        if(this.bytesEnable){
+                            this.IdleTime=3;
+                            value.forEach(e => this.buffer.push(e));
+                            if(this.rxPromise){
+                                if(this.buffer.length>=this.rxThCount){
+                                    this.rxPromiseresolve(this.rxPromisecallback());
+                                    this.rxPromise=null;
+                                }
+                            }
+                        }
+                        if(this.rxEnable)
+                            this.rxCache.push(new TextDecoder("utf-8").decode(value));
+                    }
+                }
+            } catch (e) {
+                console.log(e);
+                // Handle |error|...
+            } finally {
+                this.COMReader.releaseLock();
+                this.COMWriter.releaseLock();
+                this.isOpen=false;
+                this.OnStatusChange(this.isOpen,this.COMInfo);
+                if(this.rxPromise){
+                    this.rxPromisereject();
+                    this.rxPromise=null;
+                }
+            }
+            return this.isOpen;
+        }
+
+        async sendString(data){
+            if(!this.isOpen)return;
+            if(data.length==0)return;
+            const encoder = new TextEncoder();
+            const encodedData = encoder.encode(data);
+            await this.COMWriter.write(Uint8Array.from(encodedData));
+        }
+        async sendBytes(data){
+            if(!this.isOpen)return;
+            if(data.length==0)return;
+            await this.COMWriter.write(Uint8Array.from(data));
+        }
+
+        async BytesMode(length){
+            this.rxThCount=length;
+            this.rxEnable=false;
+            this.bytesEnable=true;
+            this.rxCache=[];
+        }
+        async TextMode(){
+            this.rxEnable=true;
+            this.bytesEnable=false;
+            this.rxThCount=1024;
+            this.buffer=[];
+        }
+    }
+</script>
+<script>
+    class DataMap{
+        constructor(val=null){
+            this.map={};
+            this.data=val?val:[];
+            this.rpos=0;
+            this.LE=true;
+            this.mark=null;
+            this.markmap={};
+            this.writemap=[];
+            this.readcall={};
+        }
+        RegRead(k,v){
+            if(!this.readcall[k])this.readcall[k]=[];
+            this.readcall[k].push(v);
+            return this;
+        }
+        ReadCallback(k,v){
+            if(!this.readcall[k])return;
+            const calls=this.readcall[k];
+            for (let i = 0; i < calls.length; i++)calls[i](v);
+        }
+        LEMode(){
+            this.LE=true;
+        }
+        BEMode(){
+            this.LE=false;
+        }
+        set(k,v){
+            this.map[k]=v;
+            if(this.markmap['>'+k])k='>'+k;
+            this.writemap.push(this.markmap[k]);
+            this.map[k]=v;
+            return this;
+        }
+        beginWrite(){
+            this.writemap=[];
+            return this;
+        }
+        endWrite(){
+            let cmds=[...new Set(this.writemap)];
+            for (let i = 0; i < cmds.length; i++)cmds[i]=cmds[i]();
+            return cmds;
+        }
+        action(e){
+            e(this);
+            return this;
+        }
+        setBuffer(b){
+            this.data=b;
+            this.rpos=0;
+            return this;
+        }
+        claer(){
+            this.rpos=0;
+            this.data=[];
+            return this;
+        }
+        w32(v){
+            if(this.LE){
+                this.data.push((v>>0)&0xff);
+                this.data.push((v>>8)&0xff);
+                this.data.push((v>>16)&0xff);
+                this.data.push((v>>24)&0xff);
+            }
+            else{
+                this.data.push((v>>24)&0xff);
+                this.data.push((v>>16)&0xff);
+                this.data.push((v>>8)&0xff);
+                this.data.push((v>>0)&0xff);
+            }
+            return this;
+        }
+        w32k(v){
+            this.w32(this.map[v]);
+            return this;
+        }
+        w16(v){
+            if(this.LE){
+                this.data.push((v>>0)&0xff);
+                this.data.push((v>>8)&0xff);
+            }
+            else{
+                this.data.push((v>>8)&0xff);
+                this.data.push((v>>0)&0xff);
+            }
+            return this;
+        }
+        w16k(v){
+            this.w16(this.map[v]);
+            return this;
+        }
+        w8(v){
+            this.data.push(v&0xff);
+            return this;
+        }
+        w8k(v){
+            this.w8(this.map[v]);
+            return this;
+        }
+        align(pos){
+            let len=this.data.length+pos-1;
+            len=(len/pos)|0;
+            len*=pos;
+            while(this.data.length<len)this.data.push(0);
+            return this;
+        }
+        wbuff(buff){
+            buff.forEach(e=>this.data.push(e));
+            return this;
+        }
+        wbuffk(v){
+            this.wbuff(this.map[v])
+            return this;
+        }
+
+        bytes(){
+            return new Uint8Array(this.data);
+        }
+
+
+        r8(){
+            return this.data[this.rpos++];
+        }
+        r8k(v){
+            if(this.mark)this.markmap[v]=this.mark;
+            this.map[v]=this.r8();
+            return this;
+        }
+        r16(){
+            let v=0;
+            if(this.LE){
+                v=this.data[this.rpos++];
+                v|=this.data[this.rpos++]<<8;
+            }
+            else{
+                v=this.data[this.rpos++]<<8;
+                v|=this.data[this.rpos++];
+            }
+            return v;
+        }
+        r16k(v){
+            if(this.mark)this.markmap[v]=this.mark;
+            this.map[v]=this.r16();
+            return this;
+        }
+        r32(){
+            let v=0;
+            if(this.LE){
+                v=this.data[this.rpos++];
+                v|=this.data[this.rpos++]<<8;
+                v|=this.data[this.rpos++]<<16;
+                v|=this.data[this.rpos++]<<24;
+            }
+            else{
+                v=this.data[this.rpos++]<<24;
+                v|=this.data[this.rpos++]<<16;
+                v|=this.data[this.rpos++]<<8;
+                v|=this.data[this.rpos++];
+            }
+            return v;
+        }
+        r32k(v){
+            if(this.mark)this.markmap[v]=this.mark;
+            this.map[v]=this.r32();
+            return this;
+        }
+        rbuff(len){
+            let v=[];
+            while(len--)v.push(this.data[this.rpos++]);
+            return v;
+        }
+        rbuffk(v,len){
+            if(this.mark)this.markmap[v]=this.mark;
+            this.map[v]=this.rbuff(len);
+            return this;
+        }
+        rappend(v,len){
+            while(len--)v.push(this.data[this.rpos++]);
+            return v;
+        }
+        rskip(len){
+            this.rpos+=len;
+            return this;
+        }
+
+
+        readhex(n){
+            let v=0;
+            let h;
+            while(n--!=0){
+                v<<=4;
+                h=this.r8();
+                v |= h<=57?h-48:(h>=97?h-87:h-55);
+            }
+            return v;
+        }
+
+        rh4k(v){
+            if(this.mark)this.markmap[v]=this.mark;
+            const e=this.map[v]=this.readhex(1);
+            this.ReadCallback(v,e);
+            return this;
+        }
+        
+        rh8k(v){
+            if(this.mark)this.markmap[v]=this.mark;
+            const e=this.map[v]=this.readhex(2);
+            this.ReadCallback(v,e);
+            return this;
+        }
+        rh16k(v){
+            if(this.mark)this.markmap[v]=this.mark;
+            const e=this.map[v]=this.readhex(4);
+            this.ReadCallback(v,e);
+            return this;
+        }
+        rh32k(v){
+            if(this.mark)this.markmap[v]=this.mark;
+            const e=this.map[v]=this.readhex(8);
+            this.ReadCallback(v,e);
+            return this;
+        }
+        rstr(){
+            let s=[];
+            let h;
+            while(h=this.r8()){
+                s.push(String.fromCharCode(h))
+            }
+            return s.join('');
+        }
+        rstrk(v){
+            if(this.mark)this.markmap[v]=this.mark;
+            const e=this.map[v]=this.rstr();
+            this.ReadCallback(v,e);
+            return this;
+        }
+        writehex(val,n){
+            let v=[];
+            while(n--!=0){
+                if(this.LE)v.unshift((val&0xf).toString(16).toUpperCase().charCodeAt());
+                else v.push((val&0xf).toString(16).toUpperCase().charCodeAt());
+                val>>=4;
+            }
+            return v;
+        }
+        wh4(v){
+            this.wbuff(this.writehex(v,1));
+            return this;
+        }
+        wh8(v){
+            this.wbuff(this.writehex(v,2));
+            return this;
+        }
+        wh16(v){
+            this.wbuff(this.writehex(v,4));
+            return this;
+        }
+        wh32(v){
+            this.wbuff(this.writehex(v,8));
+            return this;
+        }
+        wh4k(v){
+            if(this.mark)this.markmap['>'+v]=this.mark;
+            this.wbuff(this.writehex(this.map[v],1));
+            return this;
+        }
+        wh8k(v){
+            if(this.mark)this.markmap['>'+v]=this.mark;
+            this.wbuff(this.writehex(this.map[v],2));
+            return this;
+        }
+        wh16k(v){
+            if(this.mark)this.markmap['>'+v]=this.mark;
+            this.wbuff(this.writehex(this.map[v],4));
+            return this;
+        }
+        wh32k(v){
+            if(this.mark)this.markmap['>'+v]=this.mark;
+            this.wbuff(this.writehex(this.map[v],8));
+            return this;
+        }
+        wstr(str){
+            for (let i = 0; i < str.length; i++) {
+                this.w8(str[i].charCodeAt());
+            }
+            return this;
+        }
+
+        setMap(map){
+            this.map=map;
+            return this;
+        }
+        setMark(mark){
+            this.mark=mark;
+            return this;
+        }
+        MarkValue(k,v){
+            this.markmap[k]=v;
+            return this;
+        }
+    }
+</script>
+<script>
+    class Pipe{
+        constructor(write,read,endkey='\n'){
+            this.endchar=endkey.charCodeAt();
+            this.startchars=['>'.charCodeAt()];
+            this.Delay=500;
+            this.mask=0xff;
+            this.Entity=[];
+            this.writecall=write?write:()=>{};
+            this.readcall=read?read:()=>{};
+            this.timer=setInterval(() => {
+                if(this.Entity.length==0)return;
+                let e=this.Entity[0];
+                if(e.time<=0){
+                    if(--e.count==0)this.Entity.shift();
+                    e.time+=e.delay;
+                    this.writecall(e.value);
+                }
+                else
+                    e.time-=10;
+            }, 10);
+            this.rpos=0;
+        }
+        clear(){
+            this.Entity=[];
+        }
+        Count(){
+            return this.Entity.length;
+        }
+        packet(cmd,match,count){
+            if(cmd.constructor == String){
+                match=match && match || cmd.substring(0,4);
+                match=new TextEncoder().encode(match);
+                cmd=new TextEncoder().encode(cmd);
+            }
+            else{
+                match=match && match || cmd.slice(0,4);
+            }
+            return {value:cmd,match:match,count:count,time:0,delay:this.Delay};
+        }
+        write(cmd,match=null,count=5){
+            let e=this.packet(cmd,match,count);
+            this.Entity.push(e);
+            return e;
+        }
+        writeready(cmd,match=null,count=5){
+            let e=this.packet(cmd,match,count);
+            this.Entity.unshift(e);
+            return e;
+        }
+        writenak(cmd){
+            this.writecall(cmd.constructor == String?new TextEncoder().encode(cmd):cmd);
+        }
+        read(buff){
+            while(buff.length>this.rpos){
+                let c=buff[this.rpos];
+                let index=this.rpos-1;
+                if(c==this.endchar){
+                    while(index){
+                        if(this.startchars.includes(buff[index]))break;
+                        index--;
+                    }
+                    let va=buff.splice(0,this.rpos+1);
+                    let v=va.slice(index);
+                    if(this.Entity.length!=0){
+                        const e=this.Entity[0].match;
+                        if(e.length<=v.length){
+                            let match=true;
+                            for (let i = 0; i < e.length; i++) {
+                                if(v[i] != e[i] && e[i]!=this.mask){
+                                    match=false;
+                                    break;
+                                }
+                            }
+                            if(match){
+                                this.Entity.shift();
+                            }
+                        }
+                    }
+                    this.readcall(v);
+                    this.rpos=0;
+                    continue;
+                }
+                this.rpos++;
+            }
+        }
+    }
+</script>
+<script>
+    class Chart{
+        constructor(canvas,adv=0xff){
+            this.canvas=canvas;
+            this.ctx=canvas.getContext('2d');
+            this.tempCanvas = document.createElement('canvas');
+            this.tempCtx = this.tempCanvas.getContext('2d');
+            this.wavedata=[];
+            this.wave=[];
+            this.subwavedata=[];
+            this.maxCache=10000;
+            this.width = this.tempCanvas.width = canvas.width;
+            this.height = this.tempCanvas.height = canvas.height;
+            
+            this.colorlist=['#00f','#f00','#ff0','#0ff','#0f0','#f0f','#000'];
+            this.waveName=[];
+            
+            this.AdvType={ToolTip:1,Drag:2,TopRange:4};
+            this.EnableToolTip=adv&this.AdvType.ToolTip;
+            this.EnableTopRange=adv&this.AdvType.TopRange;
+            this.CheckDragRate=(x,y)=>{
+                if(!this.EnableTopRange)return false;
+                const hw=this.width/2;
+                if(x>hw-25&&x<hw+25&&y<20){
+                    return true;
+                }
+                return false;
+            }
+            
+            this.isDragging = false; // 拖动状态
+            this.isDragRate = false;
+            this.dragStartX = 0; // 拖动起始X坐标
+            this.drawStartXOffset=0;
+            this.dragStartY = 0; // 拖动起始Y坐标
+
+            this.pointsize=2;
+            this.maxPoints=1000;
+            this.showPoints=50;
+            this.dataIndex=0;
+            this.dragXBase=0;
+            this.dragXIndex=0;
+            this.pointwidth=this.width/this.showPoints;
+            this.selectpoint=-1;
+            this.hoverindex=-1;
+            this.hoverpos=[0,0];
+            this.font='14px Arial';
+            
+            this.Amplitude={
+                max:1,
+                min:0,
+            };
+            this.Amplitude.max=1;
+            this.Amplitude.min=0;
+            this.AmplitudeOffset = 0; // 幅度偏移
+            this.Amplitudeauto=1;
+            this.AmplitudePadding=0;
+            this.AmplitudeKeepMax=0;
+            this.AmplitudeList=[this.Amplitude];
+            this.pointheight=this.height/(this.Amplitude.max-this.Amplitude.min);
+            this.drawReq=false;
+            this.drawImage();
+
+            if(adv&this.AdvType.Drag){
+            // 为画布添加事件监听器
+            canvas.addEventListener('wheel', (e)=>this.handleZoom(e)); // 添加滚轮事件监听器
+            canvas.addEventListener('mousedown', (e)=>this.handleMouseDown(e)); // 添加鼠标按下事件监听器
+            // 添加鼠标移动事件监听器
+            document.addEventListener('mousemove', (e)=>this.handleMouseMove(e)); 
+            document.addEventListener('mouseup', (e)=>this.handleMouseUp(e)); // 添加鼠标释放事件监听器
+            }
+            this.timer=setInterval(() => {
+                this.drawImage();
+            }, 33);
+            
+        }
+
+        PixelX2Value(x){
+            let pos=((x-this.pointwidth/2)/this.pointwidth+1)|0;
+            if(pos>=this.showPoints)pos=this.showPoints-1;
+            if(pos<0)pos=0;
+            return pos;
+        }
+
+        drawcur(w=true,h=0){
+            let ctx=this.ctx;
+            // 绘制水平轴（时间轴）
+            ctx.beginPath();
+            //ctx.moveTo(0, this.amplitude);
+            //ctx.lineTo(width, this.amplitude);
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, this.height);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.font='12px Arial';
+            // 绘制幅度刻度
+            const amplitudeRange = this.Amplitude.max -this.Amplitude.min;
+            const amplitudeSteps = 5;
+            const amplitudeStepHeight = this.height / amplitudeSteps;
+            const amppos=this.AmplitudeOffset<0?-((-this.AmplitudeOffset/amplitudeStepHeight)|0):((this.AmplitudeOffset/amplitudeStepHeight)|0);
+            const ampoffsetpos=this.AmplitudeOffset%amplitudeStepHeight;
+            for (let i = 0; i < amplitudeSteps+1; i++) {
+                ctx.beginPath();
+                const text=`${(amplitudeRange/amplitudeSteps*(amplitudeSteps-i+amppos)+this.Amplitude.min).toFixed(0)}`;
+                if(h<0){
+                    ctx.moveTo(this.width, i * amplitudeStepHeight+ampoffsetpos);
+                    ctx.lineTo(this.width-10, i * amplitudeStepHeight+ampoffsetpos);
+                    ctx.strokeText(text, this.width-text.length*9-8, i * amplitudeStepHeight + 5+ampoffsetpos);
+                }
+                else{
+                    ctx.moveTo(0, i * amplitudeStepHeight+ampoffsetpos);
+                    ctx.lineTo(10, i * amplitudeStepHeight+ampoffsetpos);
+                    ctx.strokeText(text, 15, i * amplitudeStepHeight + 5+ampoffsetpos);
+                }
+                ctx.stroke();
+            }
+            
+            if(!w)return;
+            // 绘制时间刻度
+            const timeSteps = 10;
+            const timeStepWidth = this.width / timeSteps;
+            for (let i = 1; i < timeSteps; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * timeStepWidth, this.height);
+                ctx.lineTo(i * timeStepWidth, this.height - 10);
+                const text=`${(i * this.showPoints/(timeSteps)+this.dataIndex)|0}`;
+                ctx.strokeText(text, i * timeStepWidth - text.length*3.5, this.height - 15);
+                ctx.stroke();
+            }
+        }
+
+        drawwave(wave=null,color='#00f'){
+            wave=wave?wave:this.wave;
+            let ctx=this.ctx;
+            // 如果没有波形数据，直接返回
+            if (wave.length === 0) {
+                return;
+            }
+
+            // 压缩波形数据以确保最大显示点数
+            let compressedWave = wave;
+            
+
+            // 计算波形数据的最大值和最小值
+            if(this.Amplitudeauto){
+                let padding=this.AmplitudePadding;
+                if(padding<1&&padding>0){
+                    const maxa = Math.max(...compressedWave);
+                    const mina = Math.min(...compressedWave);
+                    const rt=maxa-mina;
+                    if(this.AmplitudeKeepMax){
+                        if(this.Amplitude.max<maxa)
+                            this.Amplitude.max=maxa+padding*rt;
+                        if(this.Amplitude.min>mina)
+                            this.Amplitude.min=mina-padding*rt;
+                    }
+                    else{
+                        this.Amplitude.max=maxa;
+                        this.Amplitude.min=mina;
+                        this.Amplitude.max+=padding*rt;
+                        this.Amplitude.min-=padding*rt;
+                    }
+                }
+                else{
+                    this.Amplitude.max = Math.max(...compressedWave)+this.AmplitudePadding;
+                    this.Amplitude.min = Math.min(...compressedWave)-this.AmplitudePadding;
+                }
+                this.pointheight=this.height/(this.Amplitude.max-this.Amplitude.min);
+            }
+            const amplitudeRange = this.Amplitude.max -this.Amplitude.min;
+            // 计算中心幅度和缩放因子
+            const amplitude = this.height + this.AmplitudeOffset;
+            const scale = amplitudeRange > 0 ? (this.height) / amplitudeRange : 1;
+
+            // 开始绘制波形路径
+            ctx.beginPath();
+            ctx.moveTo(0, amplitude - (compressedWave[0] - this.Amplitude.min) * scale);
+
+            let points=[];
+            // 循环遍历每个像素点来绘制波形
+            let max=this.showPoints>this.maxPoints && this.maxPoints || this.showPoints;
+            if(this.showPoints>this.maxPoints){
+                let maxp=this.maxPoints;
+                if(this.wavedata.length<this.showPoints){
+                    maxp=this.wavedata.length/this.showPoints*max;
+                }
+                if (wave.length > maxp) {
+                    const step = wave.length / maxp;
+                    compressedWave = Array.from({ length: maxp }, (_, i) => {
+                        const start = Math.floor(i * step);
+                        const end = Math.ceil((i + 1) * step);
+                        const segment = wave.slice(start, end);
+                        return segment.reduce((sum, val) => sum + val, 0) / segment.length;
+                    });
+                }
+            }
+            for (let i = 0; i < max; i++) {
+                if(compressedWave.length<=i)break;
+                const x = Math.floor((i / max) * this.width);
+                const y = amplitude - (compressedWave[i] - this.Amplitude.min) * scale;
+                ctx.lineTo(x, y);
+                points.push([x,y]);
+            }
+            // 设置线条样式并绘制波形
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            let ps=this.pointsize;
+            if(ps){
+                ctx.fillStyle = '#000';
+                for (let i = 0; i < points.length; i++) {
+                    const e=points[i];
+                    ctx.beginPath();
+                    ctx.arc(e[0], e[1], ps, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.closePath();
+                }
+                ctx.stroke();
+            }
+
+            return points;
+        }
+        drawindex(points){
+            if(this.hoverindex<0)return;
+            if(this.hoverindex>=this.wave.length)return;
+            if(points.length<=this.hoverindex)return;
+            let ctx=this.ctx;
+            const x=points[this.hoverindex][0];
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, this.height);
+            ctx.strokeStyle = '#3333337f';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            const e=points[this.hoverindex];
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(e[0], e[1], 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+            ctx.stroke();
+            
+
+            let lx = this.hoverpos[0]+20;
+            let ly = this.hoverpos[1];
+            lx+=(lx>this.width-130?-130:0);
+            ly+=(ly>this.height-65?-60:0);
+            ctx.fillStyle = '#eeec';
+            ctx.fillRect(lx, ly, 100, 60);
+            ctx.fillStyle = '#000c';
+            ctx.strokeStyle = '#000c';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(lx, ly, 100, 60);
+            ctx.font = this.font;
+            ctx.strokeText(`索引:${(this.hoverindex+this.dataIndex)}`, lx+3, ly+15);
+            ctx.strokeText(`值:${(this.wave[this.hoverindex]).toFixed(2)}`, lx+3, ly+30);
+            for (let i = 0; i < this.subwavedata.length; i++) {
+                ctx.strokeText(`值${i+2}:${(this.subwavedata[i][this.dataIndex+this.hoverindex]).toFixed(2)}`, lx+3, ly+45+i*15);
+            }
+            ctx.fill();
+        }
+        
+
+        drawratemove(){
+            let ctx=this.ctx;
+            let lx=this.width/2-25;
+            let ly=2;
+            ctx.fillStyle = '#eeec';
+            ctx.fillRect(lx, ly, 51, 20);
+            ctx.lineWidth = 1;
+
+            ctx.strokeStyle = '#000';
+            ctx.strokeRect(lx, ly, 51, 20);
+            ctx.strokeRect(lx+3, ly+12, 45, 4);
+
+            let poff=45*(this.dataIndex+this.showPoints/2)/this.wavedata.length;
+            let plen=45*this.showPoints/this.wavedata.length;
+            let dx=poff-plen/2;
+            if((dx+plen)>46)dx-=(dx+plen)-46;
+            if(dx<0)dx=0;
+            if(plen>=45)plen=45;
+            plen=plen>0?plen:1;
+
+            ctx.beginPath();
+            ctx.moveTo(lx+dx+plen/2+3, ly+11); // Top vertex
+            ctx.lineTo(lx+dx+plen/2+7, ly+11-6); // Bottom left vertex
+            ctx.lineTo(lx+dx+plen/2-1, ly+11-6); // Bottom right vertex
+            ctx.closePath();
+            ctx.fillStyle = '#000';
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = '#f00';
+            ctx.strokeRect(lx+dx+3, ly+12, plen, 4);
+        }
+
+        drawNames(){
+            if(this.waveName.length==0)return;
+            let ctx=this.ctx;
+            ctx.fillStyle = '#eeec';
+            ctx.fillRect(this.width-105, 15, 65, 5+15*this.waveName.length);
+            ctx.fillStyle = '#000c';
+            ctx.strokeStyle = '#000c';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(this.width-105, 15, 65, 5+15*this.waveName.length);
+            ctx.font = '12px Arial';//this.font;
+            for (let i = 0; i < this.waveName.length; i++) {
+                ctx.fillStyle = ctx.strokeStyle = this.colorlist[i];
+                ctx.strokeText('——', this.width-105+3, 13+15+i*15);
+                ctx.fillStyle = ctx.strokeStyle = '#000';
+                ctx.strokeText(this.waveName[i], this.width-105+3+32, 13+15+i*15);
+            }
+            ctx.fill();
+        }
+
+        drawImage(){
+            if(!this.drawReq)return;
+            this.drawReq=false;
+            // 清除画布
+            this.ctx.clearRect(0, 0, this.width, this.height);
+
+            for (let i = 0; i < this.subwavedata.length; i++) {
+                this.Amplitude=this.AmplitudeList[1+i];
+                this.drawwave(this.subwavedata[i].slice(this.dataIndex,this.dataIndex+this.showPoints),this.colorlist[i+1]);
+                if(i==0)this.drawcur(false,-1);
+            }
+            this.wave=this.wave || this.wavedata.slice(this.dataIndex,this.dataIndex+this.showPoints);
+            this.Amplitude=this.AmplitudeList[0];
+            const points=this.drawwave();
+            if(this.EnableToolTip)
+                this.drawindex(points);
+            this.drawcur();
+            this.drawNames();
+            if(this.EnableTopRange)     
+                this.drawratemove();
+        }
+
+        draw(){
+            this.drawReq=true;
+        }
+
+        
+
+        setName(...name){
+            this.waveName=name;
+        }
+
+        AddPoint(...v){
+            if(this.wavedata.length>=this.maxCache){
+                this.wavedata.shift();
+                this.dataIndex-=1;
+            }
+            this.wavedata.push(v[0]);
+            if(this.wavedata.length>=this.showPoints)
+            {
+                this.dataIndex+=1;
+            }
+            if(this.wavedata.length==this.showPoints){
+                this.dataIndex=0;
+            } 
+            for (let i = 1; i < v.length; i++) {
+                if(this.subwavedata.length<i){
+                    this.subwavedata.push([]);
+                    this.AmplitudeList.push({
+                        max:1,
+                        min:0,
+                    });
+                }
+                if(this.subwavedata[i-1].length>this.maxCache)this.subwavedata[i-1].shift();
+                this.subwavedata[i-1].push(v[i]);
+            }
+            this.wave=null;
+            this.draw()
+        }
+
+        Clear(){
+            this.wavedata.length=0;
+            for (let i = 0; i < this.subwavedata.length; i++) {
+                this.subwavedata[i].length=0;
+            }
+            this.dataIndex=0;
+        }
+
+        handleMouseDown(event) {
+            if(event.button==0){
+                this.drawStartXOffset = event.offsetX;
+                this.dragStartX = event.clientX; // 记录鼠标按下时的X坐标
+                this.dragStartY = event.clientY; // 记录鼠标按下时的Y坐标
+
+                if(this.CheckDragRate(event.offsetX,event.offsetY)){
+                    this.isDragRate=true;
+                    //console.log(`DX:${this.dragStartX}`);
+                    return;
+                }
+                this.dragXBase=this.dataIndex;
+                this.isDragging = true; // 设置拖动状态为true
+                //console.log(`x:${this.dragStartX}`);
+            }
+            if(event.button==1){
+                this.AmplitudeOffset=0;
+                this.Amplitudeauto=true;
+                for (let i = 0; i < this.AmplitudeList.length; i++) {
+                    this.AmplitudeList[i]={max:1,min:0};
+                }
+                this.draw(); // 重新绘制波形
+            }
+        }
+        // 处理鼠标释放事件以结束拖动
+        handleMouseUp() {
+            this.isDragging = false; // 设置拖动状态为false
+            this.isDragRate = false;
+            this.dragXIndex=0;
+            this.draw();
+        }
+
+        handleMouseMove(event) {
+            this.hoverindex=-1;
+            if(this.isDragRate){
+                const dpos=event.clientX-this.dragStartX+this.drawStartXOffset-this.width/2+50/2-2;
+                this.dataIndex=this.wavedata.length/45*dpos-this.showPoints/2;
+                if(this.wavedata.length>=(this.showPoints)){
+                    if((this.dataIndex-1)<0)this.dataIndex+=-(this.dataIndex-1);
+                    if(this.dataIndex+this.showPoints>this.wavedata.length)this.dataIndex=this.wavedata.length-this.showPoints;
+                    if(this.dataIndex<0)this.dataIndex=0;
+                }
+                else{
+                    this.dataIndex=0;
+                }
+                this.dataIndex|=0;
+                this.wave=null;//this.wave=this.wavedata.slice(this.dataIndex,this.dataIndex+this.showPoints);
+                this.draw();
+                //console.log(`dpos:${dpos}`);
+                
+            }
+            else if (this.isDragging) { // 如果处于拖动状态
+                
+                let num=this.PixelX2Value(this.drawStartXOffset)-this.PixelX2Value(event.clientX-this.dragStartX+this.drawStartXOffset);
+                if(this.wavedata.length>=this.showPoints){
+                    const n1=num;
+                    if(this.dragXBase+num-1<0)
+                    {
+                        num+=-(this.dragXBase+num);
+                        //console.log(`n1:${n1} num:${num}`);
+                    }
+                    else if(this.dragXBase+this.showPoints+num-1>=this.wavedata.length)
+                    {
+                        num-=this.dragXBase+this.showPoints+num-1-this.wavedata.length+1;
+                        //console.log(`n2:${n1} num:${num}`);
+                    }
+                    //console.log(`n3:${n1} num:${num}`);
+                    this.dragXIndex=num;
+                    let pos=this.dragXIndex+this.dragXBase;
+                    if((pos+this.showPoints)>this.wavedata.length)pos=this.wavedata.length-this.showPoints;
+                    if(pos<0)pos=0;
+                    this.dataIndex=pos;
+
+                    this.wave=null;//this.wave=this.wavedata.slice(this.dataIndex,this.dataIndex+this.showPoints);
+                }
+
+                const deltaY = event.clientY - this.dragStartY; // 计算Y方向的移动距离
+                this.AmplitudeOffset += deltaY; // 更新幅度偏移
+                this.dragStartY = event.clientY; // 更新当前鼠标Y坐标
+
+                this.draw();
+                //selectpoint=PixelX2Value(event.offsetX)+dragXIndex+dataIndex;
+                //drawWaveform(); // 重新绘制波形
+            }
+            else{
+                this.hoverindex=-1;
+                const r=this.canvas.getBoundingClientRect();
+                const x=(event.clientX-r.left)|0;
+                const y=(event.clientY-r.top)|0;
+                if(x<0||x>this.canvas.width||y<0||y>this.canvas.height)return;
+                this.hoverpos=[x,y];
+                this.hoverindex=this.PixelX2Value(x);
+                this.draw();
+                //console.log(`x:${x} hover:${this.hoverindex}`);
+                
+            }
+        }
+
+        // 处理鼠标滚轮事件以实现缩放功能
+        handleZoom(event) {
+            event.preventDefault(); // 阻止默认行为
+            const delta = Math.sign(event.deltaY); // 获取滚轮方向
+            
+            if(event.offsetX<this.width*0.1){
+                this.Amplitudeauto=false;
+                const size=this.Amplitude.max-this.Amplitude.min;
+                if(size<=400){
+                    this.Amplitude.max+=size*0.15*delta;
+                    this.Amplitude.min-=size*0.15*delta;
+                }
+                else{
+                    this.Amplitude.max+=100*delta;
+                    this.Amplitude.min-=100*delta;
+                }
+            }
+            else{
+                this.hoverindex=-1;
+                const x=this.PixelX2Value(event.offsetX);
+                const xp=(x-.5+1)*100/this.showPoints;
+                const markpos=(this.dataIndex+(xp*this.showPoints/100))|0;
+
+                
+                if(this.showPoints>1000)this.showPoints+=(delta*0.05*this.showPoints)|0;
+                else this.showPoints += delta * 25; // 调整最大显示点数
+                if (this.showPoints < 25) this.showPoints = 25; // 确保最大显示点数不低于100
+                
+
+                if(delta<0)
+                    this.dataIndex=(markpos+(100-xp)*this.showPoints/100+0.5-this.showPoints)|0;
+                else
+                    this.dataIndex=((markpos+(100-xp)*this.showPoints/100-this.showPoints)+1)|0;
+                //console.log(`x:${x} r:${xp} mk:${markpos} index:${this.dataIndex}`);
+                if(this.wavedata.length>=(this.showPoints)){
+                    if((this.dataIndex-1)<0)this.dataIndex+=-(this.dataIndex-1);
+                    if(this.dataIndex+this.showPoints>this.wavedata.length)this.dataIndex=this.wavedata.length-this.showPoints;
+                    if(this.dataIndex<0)this.dataIndex=0;
+                }
+                else{
+                    this.dataIndex=0;
+                }
+                let max=this.showPoints>this.maxPoints && this.maxPoints || this.showPoints;
+                this.pointwidth=this.width/max;
+                this.wave=null;//this.wave=this.wavedata.slice(this.dataIndex,this.dataIndex+this.showPoints);
+            }
+            this.draw(); // 重新绘制波形
+        }
+    }
+</script>
+<script>
+
+    function codec485(tab=rs485protocol){
+        Handle=tab;
+        tab.encode={};
+        tab.decode={};
+        tab.device={};
+        tab.block={};
+        const testdata='000000000000000000000000000000000000000';
+        const map=tab.helper=new DataMap();
+        tab.encode['$']=()=>{
+            return map.claer().wstr('>00$').bytes();
+        }
+        tab.decode['$']=(e)=>{
+            map.setBuffer(e).setMark(null)
+            .rskip(1).rh8k('nID');
+        }
+        tab.encode['A']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('A').bytes();
+        }
+        tab.decode['A']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['A']())
+            .rskip(1).rh8k('tID').rskip(1).rstrk('Name');
+        }
+        tab.encode['a']=()=>{
+            return map.claer().setMark(()=>tab.encode['a']())
+            .wstr('>').wh8k('ID').wstr('a').wh4k('Enable').bytes();
+        }
+        tab.encode['a']();
+
+        tab.encode['B']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('B').bytes();
+        }
+        tab.decode['B']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['B']()).rskip(4)
+            .rh8k   ('回零模式')
+            .rh32k  ('回零速度')
+            .rh32k  ('回零加速度')
+            .rh32k  ('回零偏移')
+            .rh8k   ('回零电流')
+            .rh4k   ('回零传感器模式')
+            .rh32k  ('回零确认时间')
+            .rh32k  ('回零最大距离');
+        }
+        tab.decode['B'](testdata);
+
+        tab.encode['b']=()=>{
+            return map.claer().setMark(e=>tab.encode['b']())
+            .wstr('>').wh8k('ID').wstr('b')
+            .wh8k   ('回零模式')
+            .wh32k  ('回零速度')
+            .wh32k  ('回零加速度')
+            .wh32k  ('回零偏移')
+            .wh8k   ('回零电流')
+            .wh4k   ('回零传感器模式')
+            .wh32k  ('回零确认时间')
+            .wh32k  ('回零最大距离')
+            .bytes();
+        }
+        tab.encode['b']();
+        tab.decode['b']=(e)=>{}
+
+        tab.encode['D']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('D')
+            .wh32k('电机坐标')
+            .bytes();
+        }
+        tab.encode['D']();
+        tab.decode['D']=(e)=>{}
+
+        tab.encode['E']=()=>{
+            return map.claer().setMark(()=>tab.encode['E']())
+            .wstr('>').wh8k('ID').wstr('E').wh4k('松夹电爪')
+            .bytes();
+        }
+        tab.encode['E']();
+        tab.decode['E']=(e)=>{}
+        
+
+        tab.encode['F']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('F').bytes();
+        }
+        tab.decode['F']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['F']()).rskip(4)
+            .rh32k  ('探测最大距离')
+            .rh32k  ('探测速度')
+            .rh32k  ('探测加速度')
+            .rh32k  ('探测确认时间')
+            .rh8k   ('探测电流');
+        }
+        tab.decode['F'](testdata);
+
+        tab.encode['f']=()=>{
+            return map.claer().setMark(e=>tab.encode['f']())
+            .wstr('>').wh8k('ID').wstr('f')
+            .wh32k  ('探测最大距离')
+            .wh32k  ('探测速度')
+            .wh32k  ('探测加速度')
+            .wh32k  ('探测确认时间')
+            .wh8k   ('探测电流')
+            .bytes();
+        }
+        tab.encode['f']();
+        tab.decode['f']=(e)=>{}
+
+        tab.encode['G']=()=>{
+            return map.claer().setMark(null).MarkValue('设备复位',()=>tab.encode['G']())
+            .wstr('>').wh8k('ID').wstr('G')
+            .bytes();
+        }
+        tab.encode['G']();
+        tab.decode['G']=(e)=>{}
+
+        tab.encode['g']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('g')
+            .bytes();
+        }
+        tab.decode['g']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['g']()).rskip(4)
+            .rh8k('回零状态');
+        }
+        tab.decode['g'](testdata);
+
+        tab.encode['h']=()=>{
+            return map.claer().setMark(e=>tab.encode['h'])
+            .wstr('>').wh8k('ID').wstr('h')
+            .wh32k('相对位置')
+            .wh8k('最大速度')
+            .bytes();
+        }
+        tab.encode['h']();
+        tab.decode['h']=(e)=>{}
+
+        tab.encode['i']=()=>{
+            return map.claer().setMark(e=>tab.encode['i']())
+            .wstr('>').wh8k('ID').wstr('i')
+            .wh8k('newID')
+            .bytes();
+        }
+        tab.encode['i']();
+        tab.decode['i']=(e)=>{
+            map.setBuffer(e).setMark(null).rskip(4)
+            .rh8k('newID');
+        }
+
+        tab.encode['I']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('I').bytes();
+        }
+        tab.decode['I']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['I']()).rskip(4)
+            .rh32k('实时位置')
+            .rh8k('实时电流')
+            .rh4k('Enable')
+            .rh8k('状态');
+        }
+        tab.decode['I'](testdata);
+
+        tab.encode['j']=()=>{
+            return map.claer().setMark(e=>tab.encode['j']())
+            .wstr('>').wh8k('ID').wstr('j')
+            .wh32k('液位探测高速距离')
+            .wh32k('液位探测入水深度')
+            .bytes();
+        }
+        tab.encode['j']();
+        tab.decode['j']=(e)=>{}
+
+        tab.encode['K']=()=>{
+            return map.claer().setMark(()=>tab.encode['K']())
+            .wstr('>').wh8k('ID').wstr('K')
+            .wh4k('正反转')
+            .bytes();
+        }
+        tab.encode['K']();
+        tab.decode['K']=(e)=>{}
+
+        tab.encode['m']=()=>{
+            return map.claer().setMark(()=>tab.encode['m']())
+            .wstr('>').wh8k('ID').wstr('m')
+            .wh4k('高速安装距离')
+            .bytes();
+        }
+        tab.decode['m']=(e)=>{}
+
+        tab.encode['N']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('N').bytes();
+        }
+        tab.decode['N']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['N']()).rskip(4)
+            .rh32k('夹持目标位置')
+            .rh8k ('夹持电流')
+            .rh8k ('夹持速度')
+            .rh8k ('夹持确认时间')
+            .rh4k ('上电回零');
+        }
+        tab.decode['N'](testdata);
+
+        tab.encode['n']=()=>{
+            return map.claer().setMark(e=>tab.encode['n']())
+            .wstr('>').wh8k('ID').wstr('n')
+            .wh32k('夹持目标位置')
+            .wh8k ('夹持电流')
+            .wh8k ('夹持速度')
+            .wh8k ('夹持确认时间')
+            .wh4k ('上电回零')
+            .bytes();
+        }
+        tab.encode['n']();
+        tab.decode['n']=(e)=>{}
+
+        tab.encode['P']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('P').bytes();
+        }
+        tab.decode['P']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['P']()).rskip(4)
+            .rh16k('Kp')
+            .rh16k('Ki')
+            .rh16k('Kd');
+        }
+        tab.decode['P'](testdata);
+
+        tab.encode['p']=()=>{
+            return map.claer().setMark(e=>tab.encode['p']())
+            .wstr('>').wh8k('ID').wstr('p')
+            .wh16k('Kp')
+            .wh16k('Ki')
+            .wh16k('Kd')
+            .bytes();
+        }
+        tab.encode['p']();
+        tab.decode['p']=(e)=>{}
+
+        tab.encode['Q']=()=>{
+            return map.claer().setMark(null).MarkValue('重启设备',()=>tab.encode['Q']())
+            .wstr('>').wh8k('ID').wstr('Q')
+            .bytes();
+        }
+        tab.encode['Q']();
+        tab.decode['Q']=(e)=>{}
+
+        tab.encode['R']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('R').bytes();
+        }
+        tab.decode['R']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['R']()).rskip(4)
+            .rh32k('最大速度')
+            .rh32k('最大加速度')
+            .rh8k ('最大电流')
+            .rh4k ('能耗制动')
+            .rh8k ('子程序')
+            .rh8k ('工作模式')
+            .rh16k('每圈脉冲数')
+            .rh32k('最大允许误差')
+            .rh4k ('多圈');
+        }
+        tab.decode['R'](testdata);
+
+        tab.encode['r']=()=>{
+            return map.claer().setMark(e=>tab.encode['r'])
+            .wstr('>').wh8k('ID').wstr('r')
+            .wh32k('最大速度')
+            .wh32k('最大加速度')
+            .wh8k ('最大电流')
+            .wh4k ('能耗制动')
+            .wh8k ('子程序')
+            .wh8k ('工作模式')
+            .wh16k('每圈脉冲数')
+            .wh32k('最大允许误差')
+            .wh4k ('多圈')
+            .bytes();
+        }
+        tab.encode['r']();
+        tab.decode['r']=(e)=>{}
+
+        tab.encode['U']=()=>{
+            return map.claer().setMark(()=>tab.encode['U']())
+            .wstr('>').wh8k('ID').wstr('U')
+            .wh4k('保存模式')
+            .bytes();
+        }
+        tab.encode['U']();
+        tab.decode['U']=(e)=>{}
+
+        tab.encode['W']=()=>{
+            return map.claer().setMark(null)
+            .wstr('>').wh8k('ID').wstr('W').bytes();
+        }
+        tab.decode['W']=(e)=>{
+            map.setBuffer(e).setMark(()=>tab.encode['W']()).rskip(4)
+            .rh8k('松开电流')
+            .rh8k('松开速度');
+        }
+        tab.decode['W'](testdata);
+
+        tab.encode['w']=()=>{
+            return map.claer().setMark(e=>tab.encode['w']())
+            .wstr('>').wh8k('ID').wstr('w')
+            .wh8k('松开电流')
+            .wh8k('松开速度')
+            .wh32k(0)
+            .wh32k(0)
+            .wh32k(0)
+            .bytes();
+        }
+        tab.encode['w']();
+        tab.decode['w']=(e)=>{}
+
+        tab.encode['Z']=()=>{
+            return map.claer().setMark(null).MarkValue('校准',e=>tab.encode['Z']())
+            .wstr('>').wh8k('ID').wstr('Z')
+            .bytes();
+        }
+        tab.encode['Z']();
+        tab.decode['Z']=(e)=>{}
+    }
+</script>
+<script>
+
+    var rs485protocol={};
+    var canprotocol={};
+
+
+    var CANMODE=false;
+    var PortOpen=false;
+    var COM;
+    var DataPipe=new Pipe();
+    var outputtext=document.getElementById('outputtext');
+    var inputtext=document.getElementById('inputtext');
+    var outputinfo=document.getElementById('outputinfo');
+    var posmaview=document.getElementById('posmaview');
+    
+    var devicelist=document.getElementById('devicelist');
+    var submenu=document.getElementById('submenu');
+    var infodevid=document.getElementById('infodevid');
+    var Handle=null;
+
+    function eventinput(e){
+        if(e.previousElementSibling.value!=e.value){
+            e.previousElementSibling.value=e.value;
+            e.value=e.previousElementSibling.value;    
+            e.previousElementSibling.dispatchEvent(new Event('input',{bubbles:true,cancelable:true}));
+        }
+    }
+
+    function buildupdate(helper,elist){
+        let actions=[];
+        for (let i = 0; i < elist.length; i++) {
+            let e = elist[i];
+            switch (e.tagName.toLowerCase()) {
+                case 'input':
+                    switch (e.type) {
+                        case 'text':
+                            actions.push((v)=>{
+                                e.value=v;
+                            })
+                            e.addEventListener('input',(e)=>{helper.map[e.target.id]=e.target.value|0;})
+                            break;
+                        case 'range':
+                            actions.push((v)=>{
+                                e.value=v;
+                                e.dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))
+                            })
+                            e.addEventListener('input',(e)=>{helper.map[e.target.id]=e.target.value|0;})
+                            break;
+                        case 'number':
+                            actions.push((v)=>{
+                                e.value=v;
+                            })
+                            e.addEventListener('input',(e)=>{e.target.value=helper.map[e.target.id]=e.target.value|0;})
+                            break;
+                        case 'checkbox':
+                            actions.push((v)=>{
+                                e.checked=v!=0;
+                            })
+                            e.addEventListener('input',(e)=>{helper.map[e.target.id]=e.target.checked|0;})
+                            break;
+                    }
+                    break;
+                case 'select':
+                    actions.push((v)=>{
+                        if(e.hasAttribute('cvt'))
+                            e.cvt=v;
+                        else
+                            e.selectedIndex=v;
+                        e.dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))
+                    })
+                    break;
+                case 'span':
+                    actions.push((v)=>{
+                        if(e.hasAttribute('format'))
+                            e.innerText=e.getAttribute('format').replace('{0}',''+v);
+                        else
+                            e.innerText=''+v;
+                    })
+                    break;
+            }
+            
+        }
+
+        //e.addEventListener('input',(e)=>console.log(e))
+        return (v)=>{
+            for (let i = 0; i < actions.length; i++)actions[i](v);
+        }
+    }
+
+    function bindpanel(helper,div){
+        const e = div.children;
+        let emap={};
+        for (let i = 0; i < e.length; i++) {
+            if(e[i].id){
+                if(!emap[e[i].id])emap[e[i].id]=[];
+                emap[e[i].id].push(e[i]);
+            }
+        }
+        for (let [k, v] of Object.entries(emap)) {
+            console.log(`>:${k}`);
+            if(helper.map[k]!=null){
+                console.log(k);
+                
+                helper.RegRead(k,buildupdate(helper,v));
+            }
+        }
+        return emap;
+    }
+
+    function newdevice(id){
+        let div=document.createElement('div');
+        div.onclick=()=>{
+            movediv(div,submenu);
+            if(!div.classList.contains('devicetagsel'))
+                ReadDevice();
+            selectmark(div,'devicetagsel');
+        }
+        div.style.cssText=`--sn:'${id}号设备'`;
+        div.id=id;
+        div.classList.add('devicetag');
+        devicelist.appendChild(div);
+    }
+
+    function setdevicename(id,name){
+        for (let i = 0; i < devicelist.children.length; i++) {
+            const e = devicelist.children[i];
+            if(e.id==id){
+                e.style.cssText=`--sn:'${id}号设备 ${name.substring(0,name.length-6)}'`;
+                return;
+            }
+        }
+    }
+
+    function setdevicenewid(newid){
+        let id=Handle.helper.map['ID'];
+        let name=Handle.device[id];
+        for (let i = 0; i < devicelist.children.length; i++) {
+            const e = devicelist.children[i];
+            if(e.id==id){
+                Handle.device[newid]=Handle.device[id];
+                Handle.helper.map['ID']=newid;
+                id=newid;
+                e.id=newid;
+                e.style.cssText=`--sn:'${id}号设备 ${name.substring(0,name.length-6)}'`;
+                
+                return;
+            }
+        }
+    }
+    function setnewid(newid){
+        Handle.helper.beginWrite().set('newID',newid).action(
+            e=>{
+                let packet=e.endWrite()[0];
+                let mask=packet.slice(0,4);
+                mask[1]=mask[2]=0xff;
+                DataPipe.write(packet,mask);
+            }
+        );
+    }
+
+//<div onclick="movediv(this,'fp');selectmark(this,'devicetagsel')" style="--sn:'1号设备'" class="devicetag devicetagsel"></div>
+    function ScanDevice(){
+        Handle.device={};
+        Handle.helper.map['ID']=-1;
+        DataPipe.clear();
+        DataPipe.writenak(Handle.encode['$']());
+    }
+    function VarSet(k,v){
+        Handle.helper.beginWrite().set(k,v).action(e=>DataPipe.write(e.endWrite()[0]));
+    }
+
+    function ReadDevice(){
+        if(Handle.helper.map['ID']<1)return;
+        DataPipe.write(Handle.encode['R']());
+        DataPipe.write(Handle.encode['N']());
+        DataPipe.write(Handle.encode['W']());
+        DataPipe.write(Handle.encode['B']());
+        DataPipe.write(Handle.encode['F']());
+        DataPipe.write(Handle.encode['P']());
+        DataPipe.write(Handle.encode['I']());
+        
+    }
+    function WriteDevice(){
+        if(Handle.helper.map['ID']<1)return;
+        DataPipe.write(Handle.encode['r']());
+        DataPipe.write(Handle.encode['n']());
+        DataPipe.write(Handle.encode['w']());
+        DataPipe.write(Handle.encode['b']());
+        DataPipe.write(Handle.encode['f']());
+        DataPipe.write(Handle.encode['p']());
+    }
+
+
+    function InitUI(tab=rs485protocol){
+        let infotime=100;
+        const m=tab.helper;
+        const statusinfo=["运动中[0]","到达[1]","撞击 或 夹持成功[2]","探测 或 安装成功[3]","探测失败[4]","松开到底[5]","夹持到底[6]","探测低速撞击[7]","紧急停止[8]","正在回零[9]",]
+        tab.block['I']=1;
+        tab.nIDTime=0;
+        tab.nIDCount=0;
+        tab.view=new Chart(posmaview,0);
+        tab.view.maxCache=tab.view.showPoints=100;
+        tab.view.AmplitudePadding=0.1;
+        tab.view.AmplitudeKeepMax=1;
+        tab.view.pointsize=0;
+        //tab.view.setName('位置','电流');
+
+        m.map['ID']=-1;
+        let scantimer=setInterval(()=>{
+            if(tab.nIDTime>0){
+                tab.nIDTime-=10;
+                if(tab.nIDTime<=0){
+                    const keys=Object.keys(tab.device);
+                    const id=m.map['ID'];
+                    tab.nIDCount=keys.length;
+                    for (let i = 0; i < keys.length; i++) {
+                        m.map['ID']=keys[i]|0;
+                        DataPipe.write(tab.encode['A']());
+                    }
+                    m.map['ID']=id;
+                }
+            }
+            if(m.map['ID']<1)return;
+            infotime-=10;
+            if(infotime<=0&&DataPipe.Count()<1){
+                const p=tab.encode['I']();
+                p.count=2;
+                p.delay=20;
+                DataPipe.write(p);
+                infotime=100;
+            }
+        },10);
+        m.RegRead('nID',(v)=>{
+            if(m.map['ID']<1)m.map['ID']=v;
+            tab.nIDTime=500;
+            if(tab.device[v]==null)
+                newdevice(v);
+            tab.device[v]='';
+        })
+        m.RegRead('Name',(v)=>{
+            infodevid.value=m.map['tID'];
+            tab.device[m.map['tID']]=v;
+            setdevicename(m.map['tID'],v);
+            if(--tab.nIDCount<=0){
+                let b=false;
+                for (let i = 0; i < devicelist.children.length; i++) {
+                    if(devicelist.children[i].classList.contains('devicetagsel'))b=true;
+                }
+                if(!b)
+                    devicelist.children[0].click();
+            }
+        })
+        m.RegRead('newID',(v)=>{
+            setdevicenewid(v);
+            //setdeviceid(m.map['ID'],tab.device[m.map['ID']],v);
+            //tab.device[v]=tab.device[m.map['ID']];
+            //m.map['ID']=v;
+        })
+        m.RegRead('状态',(v)=>{
+            outputinfo.innerText='状态: '+(statusinfo.length<=v?`未知状态[${v}]`:statusinfo[v]);
+            tab.view.AddPoint(Handle.helper.map['实时位置'],Handle.helper.map['实时电流']);
+            //rtma.innerText='实时电流: '+Handle.helper.map['实时电流'];
+            //rtpos.innerText='实时位置: '+Handle.helper.map['实时位置'];
+        })
+    }
+
+    function crc16(buff){
+        let crc=0xffff;
+        for (let i = 0; i < buff.length; i++) {
+            crc^=buff[i];
+            for (let j = 0; j < 8; j++) {
+                if(crc&1)crc^=0x14002;
+                crc>>=1;
+            }
+        }
+        return crc;
+    }
+
+
+    function toHex(v){
+        let hex;
+        if((v&0xf)<10)hex=String.fromCharCode(48+(v&0xf));
+        else hex=String.fromCharCode(65+(v&0xf)-10);
+        v>>>=4;
+        if((v&0xf)<10)hex=String.fromCharCode(48+(v&0xf))+hex;
+        else hex=String.fromCharCode(65+(v&0xf)-10)+hex;
+        return hex;
+    }
+    function toHex16(v){
+        return toHex((v>>>8)&0xff)+toHex(v&0xff);
+    }
+    function toHex32(v){
+        return toHex((v>>>24)&0xff)+toHex((v>>>16)&0xff)+toHex((v>>>8)&0xff)+toHex(v&0xff);
+    }
+
+
+    function SendPacket(v){
+
+        if(CANMODE){
+
+        }
+        else{
+            let crc=crc16(v);
+            let crcstr=new TextEncoder().encode(toHex16(crc)+'\r\n');
+            let info=`[${new Date().toString().split(' ')[4]}] 发送: ${new TextDecoder("utf-8").decode(v)}${toHex16(crc)}\r\n`;
+            if(!Handle.block[String.fromCharCode(v[3])])
+                outputtext.append(info);
+            COM.sendBytes(v);
+            COM.sendBytes(crcstr);
+        }
+    }
+    function openport(div,mode,bps){
+        CANMODE=mode !== 'uart';
+        if(CANMODE){
+            COM.OnStatusChange=(b,i)=>{
+                div.innerHTML=b && '关闭CAN' || '选择CAN';
+                PortOpen=b;
+            };
+            COM.Open(bps);
+        }
+        else{
+            COM.OnStatusChange=(b,i)=>{
+                div.innerHTML=b && '关闭串口' || '选择串口';
+                PortOpen=b;
+            };
+            COM.Open(bps);
+            COM.OnDataReceive=(e)=>DataPipe.read(e);
+            DataPipe.writecall=(e)=>SendPacket(e);
+            DataPipe.readcall=(e)=>{
+                let code=String.fromCharCode(e[3]);
+                rs485protocol.decode[code] && rs485protocol.decode[code](e);
+                if(rs485protocol.block[code])return;
+                let info=`[${new Date().toString().split(' ')[4]}] 接收: ${new TextDecoder("utf-8").decode(new Uint8Array(e))}\r\n`;
+                outputtext.append(info.replace('\r\n\r\n','\r\n'));
+                outputtext.scrollTop = outputtext.scrollHeight;
+            }
+
+        }
+    }
+
     function moveselect(e){
         let parent = e.parentElement;
         let lastChild = parent.lastElementChild;
@@ -402,24 +2370,106 @@
         });
         e.classList.add(name);
     }
-    function movediv(e,name){
+    function movediv(e,div){
         let parent = e.parentElement;
-        if (!parent[name]) {
-            let foundDiv = Array.from(parent.children).find(child => child.getAttribute(name) !== null);
-            parent[name]=foundDiv;
-        }
         let nextDiv = e.nextElementSibling;
-        parent[name].remove();
+        if(nextDiv==div)return;
+        div.remove();
         if (nextDiv) {
-            parent.insertBefore(parent[name], nextDiv);
+            parent.insertBefore(div, nextDiv);
         }
         else {
-            parent.appendChild(parent[name]);
+            parent.appendChild(div);
         }
-        parent[name].children[1].children[0].click();
+        div.style.display='flex';
+        div.children[1].children[0].click();
     }
-    onload=()=>{
-        //moveselect(document.querySelector('toptitle'))
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+
+        codec485();
+        InitUI();
+        bindpanel(Handle.helper,document.getElementById('参数设置面板'));
+        if(navigator==null||navigator.serial==null){
+            alert("不支持Web Serial");
+            //return;
+        }
+        navigator.serial.addEventListener("connect", (e) => {
+        // Connect to `e.target` or add it to a list of available ports.
+            console.log("串口已连接");
+        });
+
+        navigator.serial.addEventListener("disconnect", (e) => {
+        // Remove `e.target` from the list of available ports.
+            console.log("串口已断开");
+            COM.close();
+        });
+
+        navigator.serial.getPorts().then((ports) => {
+        // Initialize the list of available ports with `ports` on page load.
+            console.log(ports);
+        });
+
+        let sendbtn=document.getElementById('com_open_btn');
+        COM=new COMHelper(null,
+        null,
+        null,
+        false);
+        
+        let imgfile=async function(file) {
+            if (!file) return;
+            let extension = file.name.split('.').pop().toLowerCase();
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                if (extension === 'hex') {
+                    //download_info = {ROM:hex2bin(e.target.result)}
+                }
+                else if (extension === 'bin') {
+                    //download_info = Array.from(new Uint8Array(e.target.result));
+                }
+                else if (extension === 'axf') {
+                    //download_info = Elfparse(new Uint8Array(e.target.result));
+                }
+                else if (extension === 'flm') {
+
+                }
+                console.log(download_info);
+                
+            };
+            if (extension === 'hex') {
+                reader.readAsText(file);
+            } else {
+                reader.readAsArrayBuffer(file);
+            }
+        }
+        
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const items = e.clipboardData.items;
+            if (!items || items.length === 0) return;
+            const item = items[0];
+            if (item.kind === 'file') {
+                const file = item.getAsFile();
+                imgfile(file);
+            }
+        });
+
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            imgfile(file);
+        });
+
+        //fileInput.onchange=e=>{
+        //    const file = e.target.files[0];
+        //    imgfile(file);
+        //}
+    });
+</script>
+<script>
+    
 </script>
 </html>
