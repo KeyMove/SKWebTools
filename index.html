@@ -380,7 +380,7 @@
                         <div style="width: 100%;display: flex;justify-content: flex-end;position: absolute;">
                             <button onclick="ReadDevice()" class="bt">读取参数</button>
                             <button onclick="WriteDevice()" class="bt">更新参数</button>
-                            <button onclick="VarSet('保存模式',1)" class="bt">保存参数</button>
+                            <button onclick="VarSet('保存参数')" class="bt">保存参数</button>
                         </div>
                     </div>
                     <div style="height: 100%;width: 100%;position: relative;">
@@ -390,7 +390,7 @@
                             <span id="实时位置" format="实时位置: {0}" style="left: 553px;top: 178px;color: #00f;">实时位置: 0</span>
                             <span style="left: 5px;top: 10px;">工作模式</span>
                             <span style="left: 130px;top: 10px">子程序</span>
-                            <select id="工作模式" style="left: 5px;top: 30px;">
+                            <select cvt="[2,1]" id="工作模式" oninput=" this.cvt || (this.nextElementSibling.selectedIndex=((this.selectedIndex<1)*3))" style="left: 5px;top: 30px;">
                                 <option selected>扭矩位置模式</option>
                                 <option>位置模式</option>
                             </select>
@@ -437,7 +437,7 @@
                             <input oninput="this.previousElementSibling.value=this.value;this.value=this.previousElementSibling.value" type="number" style="left: 140px;top: 310px;width: 22px;" id="Kd_">
 
                             <span style="left: 275px;top: 10px;">回零模式</span>
-                            <select cvt="true" oninput="this.selectedIndex=[23,27,-3 & 0xff, -4&0xff,37].indexOf(this.cvt|0);" style="left: 275px;top: 30px;" id="回零模式">
+                            <select cvt="[23,27,-3 & 0xff, -4&0xff,37]" style="left: 275px;top: 30px;" id="回零模式">
                                 <option selected>开关正向回零</option>
                                 <option>开关反向回零</option>
                                 <option>撞击正向回零</option>
@@ -1973,9 +1973,8 @@
         tab.decode['r']=(e)=>{}
 
         tab.encode['U']=()=>{
-            return map.claer().setMark(()=>tab.encode['U']())
+            return map.claer().setMark(null).MarkValue('保存参数',e=>tab.encode['U']())
             .wstr('>').wh8k('ID').wstr('U')
-            .wh4k('保存模式')
             .bytes();
         }
         tab.encode['U']();
@@ -2083,6 +2082,22 @@
                         else
                             e.selectedIndex=v;
                         e.dispatchEvent(new Event('input',{bubbles:true,cancelable:true}))
+                    })
+                    e.addEventListener('input',(event)=>{
+                        let m=event.target;
+                        if(m.hasAttribute('cvt'))
+                        {
+                            if(!m.cvtlist)m.cvtlist=eval(m.getAttribute('cvt'));
+                            if(m.cvt!=null){
+                                m.selectedIndex=m.cvtlist.indexOf(m.cvt);
+                                m.cvt=null;
+                            }
+                            else{
+                                helper.map[m.id]=m.cvtlist[m.selectedIndex];
+                            }
+                        }
+                        else
+                            helper.map[m.id]=m.selectedIndex;
                     })
                     break;
                 case 'span':
