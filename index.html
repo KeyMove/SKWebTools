@@ -300,8 +300,6 @@
         <div style="position: relative; width: 100%;height: 80px;overflow: hidden;">
             <div id="toppanelitem" style="position: absolute; width: 100%;top:0;transition: 0.1s;">
 
-                    
-                
                 <div class="toppanel">
                     <div style="display: flex;">
                         <div class="toppaneldiv" onclick="msgbox.style.display='block'"><div style="--sn:'连接'"></div></div>
@@ -476,6 +474,9 @@
                             <input type="number" style="left: 473px;top: 320px;" id="夹持目标位置">
                             <div onclick="VarSet('松夹电爪',1)" class="bticon" style="right: 15px;top: 280px; --sn:'夹持'"></div>
                             <div onclick="VarSet('松夹电爪',2)" class="bticon" style="right: 88px;top: 280px; --sn:'松开'"></div>
+
+                            <span style="left: 800px;top: 168px;">启用图表</span>
+                            <input checked="true" type="checkbox" style="left: 855px;top: 170px;" id="启用图表">
                         </div>
                     </div>
                 </div>
@@ -501,8 +502,9 @@
             <div style="width: 100%;height: 100%;" onclick="this.parentElement.style.display='none';"></div>
             <div class="msgpanel">
                 <div class="toptitle">
-                    <a href="#" onclick="if(PortOpen)return;moveselect(this);comselect.style.display='block';canselect.style.display='none';">串口</a>
-                    <a href="#" onclick="if(PortOpen)return;moveselect(this);comselect.style.display='none';canselect.style.display='block';">CAN</a>
+                    <a href="#" onclick="if(PortOpen)return;moveselectshowpanel(this);">串口</a>
+                    <a href="#" onclick="if(PortOpen)return;moveselectshowpanel(this);">CAN</a>
+                    <a href="#" onclick="if(PortOpen)return;moveselectshowpanel(this);">BLE</a>
                     <span style="position: absolute;right: 5px; float: right;color: #fff;cursor: pointer;"
                         onclick="this.parentElement.parentElement.parentElement.style.display='none';">×</span>
                     <div class="titlemark"></div>
@@ -531,12 +533,12 @@
                         </select>
                     </div>
                     <div style="position: absolute;right: 20px;bottom: 20px;">
-                        <button style="width: 90px;height: 60px;" onclick="openport(this,'uart',bpsselect.value,canselect)">选择串口</button>
+                        <button style="width: 90px;height: 60px;" onclick="openport(this,'uart',bpsselect.value)">选择串口</button>
                     </div>
                 </div>
 
 
-                <div class="msgset" id="canselect" style="display: none;">
+                <div id="canselect" class="msgset" style="display: none;">
                     <div style="display: flex;margin-bottom: 10px;">
                         <span>CAN选择</span>
                         <select id="cantoolselect" style="border: 0px;background-color: transparent;color: #777;">
@@ -566,10 +568,172 @@
                 </div>
 
 
+                <div id="bleselect" class="msgset" style="display: none;">
+                    <span>固定115200波特率</span>
+                    <div style="position: absolute;right: 20px;bottom: 20px;">
+                        <button style="width: 90px;height: 60px;" onclick="openport(this,'ble')">选择蓝牙BLE</button>
+                    </div>
+                </div>
+
+
             </div>
         </div>
     </div>
 </body>
+<script>
+    class BLEUART{
+        constructor(statschange=null,onrecvdata,filters=0xfff0,readservice=0xfff1,writeservice=0xfff2){
+            if(!('bluetooth' in navigator))return;
+            this.OnStatusChange=statschange?statschange:()=>{};
+            this.OnDataReceive=onrecvdata?onrecvdata:()=>{};
+            
+
+            this.sendlist=[];
+
+            this.Sender=null;
+            this.deviceName='';
+            this.device=null;
+            this.connected=false;
+            this.Service=null;
+            this.buffer=[];
+            this.logs=[];
+            this.filters=filters;
+            this.readservice=readservice;
+            this.writeservice=writeservice;
+
+            this.rxFollowTx=true;
+            this.rxReqCount=1;
+            this.rxPromise=null;
+            this.rxPromiseresolve=null;
+            this.rxPromisereject=null;
+            this.rxPromisecallback=null;
+            let reqs=this.sendlist;
+            let sender=(v)=>this.Sender.writeValue(v);
+            let senderok=true;
+            function loop(){
+                if(reqs.length&&senderok)
+                {
+                    senderok=false;
+                    const val=reqs.shift();
+                    console.log(`[${reqs.length}] 发送：${val} `);
+                    return sender(val).then(e=>loop());
+                }
+                senderok=true;
+                return null;
+            }
+            this.timer=setInterval(() => {
+                if(senderok)
+                    loop();
+                if(this.rxReqCount==0)return;
+                if(this.buffer.length>=this.rxReqCount)
+                {
+                    //this.OnDataReceive(this.buffer);
+                    if(this.rxPromise){
+                        if(this.buffer.length>=this.rxReqCount){
+                            const buff=this.buffer.splice(0,this.rxReqCount);
+                            this.rxPromiseresolve(this.rxPromisecallback(buff));
+                            this.rxPromise=null;
+                        }
+                    }
+                }
+            }, 1);
+        }
+        log(obj){
+            this.logs.push(obj.toString());
+        }
+        Open(){
+            try{
+                navigator.bluetooth.requestDevice({ filters: [{ services: [this.filters] }] })
+                .then(device => {
+                    this.log('Connecting...');
+                    this.deviceName = device.name;
+                    this.device = device;
+                    device.addEventListener('gattserverdisconnected', (event) => {
+                        //connectButton.textContent = '连接蓝牙设备';
+                        this.OnStatusChange(this,false);
+                        this.connected=false;
+                    });
+                    return this.device.gatt.connect();
+                })
+                .then(server => {
+                    this.log('Getting Service...');
+                    return server.getPrimaryService(this.filters);
+                })
+                .then(service => {
+                    this.Service = service;
+                    this.log('Getting Characteristic...');
+                    //return service.requestMtu(250);
+                    return service.getCharacteristic(this.readservice);
+                })
+                .then(characteristic => {
+                    //myCharacteristic = characteristic;
+                    return characteristic.startNotifications().then(_ => {
+                        this.log('> Notifications started');
+                        this.log("Connected to: " + this.deviceName);
+                        characteristic.addEventListener('characteristicvaluechanged',
+                            (event) => {
+                                if(this.rxReqCount){
+                                    this.buffer.push(...new Uint8Array(event.target.value.buffer));
+                                    if(this.buffer.length>=this.rxReqCount)
+                                    {
+                                        this.OnDataReceive(this.buffer);
+                                        if(this.rxPromise){
+                                            if(this.buffer.length>=this.rxReqCount){
+                                                const buff=this.buffer.splice(0,this.rxReqCount);
+                                                this.rxPromiseresolve(this.rxPromisecallback(buff));
+                                                this.rxPromise=null;
+                                            }
+                                        }
+                                    }
+                                }
+                                else{
+                                    this.OnDataReceive(Array.from(new Uint8Array(event.target.value.buffer)));
+                                }
+                            });
+                    });
+                })
+                .then(_ => {
+                    return this.Service.getCharacteristic(this.writeservice);
+                })
+                .then(sender => {
+                    this.log('> get Sender');
+                    this.Sender = sender;
+                    this.OnStatusChange(this,true);
+                    this.connected=true;
+                    //connectButton.textContent = '断开蓝牙设备';
+                })
+                .catch(error => {
+                    this.log('蓝牙连接错误:' + error);
+                });
+            }
+            catch(error){
+                this.log('蓝牙连接错误:' + error);
+            }
+        }
+        close(){
+            try{
+                this.device.gatt.disconnect();
+            }catch(error){
+                log(`error:${error.toString()}`);
+            }
+        }
+        sendBytes(v){
+            if(!this.Sender)return;
+            if(this.rxFollowTx)this.rxReqCount=v.length;
+            this.sendlist.push(new Uint8Array(v));
+        }
+        waitBytes(call=()=>{},nbytes=-1){
+            if(nbytes>0)this.rxReqCount=nbytes;
+            if(this.rxPromise)this.rxPromisereject();
+            this.rxPromise = new Promise((resolve, reject) => {
+                this.rxPromiseresolve=resolve;
+                this.rxPromisereject=reject;
+            });
+            this.rxPromisecallback=call;
+            return this.rxPromise;
+        }
+    }
+</script>
 <script>
     class COMHelper{
         constructor(onOpenClose,OnRecvData,OnRecvString,RecvTick=true){
@@ -1074,7 +1238,7 @@
         constructor(write,read,endkey='\n'){
             this.endchar=endkey.charCodeAt();
             this.startchars=['>'.charCodeAt()];
-            this.Delay=500;
+            this.Delay=50;
             this.mask=0xff;
             this.Entity=[];
             this.writecall=write?write:()=>{};
@@ -2018,10 +2182,16 @@
     var rs485protocol={};
     var canprotocol={};
 
+    var USBCOM=new COMHelper(null,
+        null,
+        null,
+        false);
+    var BLECOM=new BLEUART();
 
     var CANMODE=false;
     var PortOpen=false;
     var COM;
+    
     var DataPipe=new Pipe();
     var outputtext=document.getElementById('outputtext');
     var inputtext=document.getElementById('inputtext');
@@ -2254,6 +2424,7 @@
             if(m.map['ID']<1)return;
             infotime-=10;
             if(infotime<=0&&DataPipe.Count()<1){
+                if(!Handle.helper.map['启用图表'])return;
                 const p=tab.encode['I']();
                 p.count=2;
                 p.delay=20;
@@ -2335,13 +2506,17 @@
             let crcstr=new TextEncoder().encode(toHex16(crc)+'\r\n');
             let info=`[${new Date().toString().split(' ')[4]}] 发送: ${new TextDecoder("utf-8").decode(v)}${toHex16(crc)}\r\n`;
             if(!Handle.block[String.fromCharCode(v[3])])
-                outputtext.append(info);
-            COM.sendBytes(v);
-            COM.sendBytes(crcstr);
+                outputtext.value+=(info);
+            const mergedArray = new Uint8Array(v.length + crcstr.length);
+            mergedArray.set(v);
+            mergedArray.set(crcstr, v.length);
+            COM.sendBytes(mergedArray);
+            //COM.sendBytes(v);
+            //COM.sendBytes(crcstr);
         }
     }
     function openport(div,mode,bps){
-        CANMODE=mode !== 'uart';
+        CANMODE=mode.toUpperCase().includes('can');
         if(CANMODE){
             COM.OnStatusChange=(b,i)=>{
                 div.innerHTML=b && '关闭CAN' || '选择CAN';
@@ -2350,19 +2525,35 @@
             COM.Open(bps);
         }
         else{
-            COM.OnStatusChange=(b,i)=>{
-                div.innerHTML=b && '关闭串口' || '选择串口';
-                PortOpen=b;
-            };
-            COM.Open(bps);
-            COM.OnDataReceive=(e)=>DataPipe.read(e);
+            if(mode=='ble'){
+                COM=BLECOM;
+                COM.rxReqCount=0;
+                COM.OnStatusChange=(b,i)=>{
+                    div.innerHTML=b && '关闭串口' || '选择蓝牙BLE';
+                    PortOpen=b;
+                };
+                COM.OnDataReceive=(e)=>DataPipe.read(e);
+                if(COM.connected)
+                    COM.close();
+                else
+                    COM.Open(bps);
+            }
+            else{
+                COM=USBCOM;
+                COM.OnStatusChange=(b,i)=>{
+                    div.innerHTML=b && '关闭串口' || '选择串口';
+                    PortOpen=b;
+                };
+                COM.OnDataReceive=(e)=>DataPipe.read(e);
+                COM.Open(bps);
+            }
             DataPipe.writecall=(e)=>SendPacket(e);
             DataPipe.readcall=(e)=>{
                 let code=String.fromCharCode(e[3]);
                 rs485protocol.decode[code] && rs485protocol.decode[code](e);
                 if(rs485protocol.block[code])return;
                 let info=`[${new Date().toString().split(' ')[4]}] 接收: ${new TextDecoder("utf-8").decode(new Uint8Array(e))}\r\n`;
-                outputtext.append(info.replace('\r\n\r\n','\r\n'));
+                outputtext.value+=(info.replace('\r\n\r\n','\r\n'));
                 outputtext.scrollTop = outputtext.scrollHeight;
             }
 
@@ -2371,6 +2562,18 @@
 
     function moveselect(e){
         let parent = e.parentElement;
+        let lastChild = parent.lastElementChild;
+        lastChild.style.left = e.offsetLeft + 'px';
+        lastChild.style.width = e.offsetWidth + 'px';
+    }
+    function moveselectshowpanel(e){
+        moveselect(e);
+        const parent = e.parentElement;
+        const index=(Array.from(parent.children).indexOf(e)+1)|0;
+        const panels=parent.parentElement;
+        for(let i=1;i<panels.children.length;i++){
+            panels.children[i].style.display=(i==index) && 'block' || 'none';
+        }
         let lastChild = parent.lastElementChild;
         lastChild.style.left = e.offsetLeft + 'px';
         lastChild.style.width = e.offsetWidth + 'px';
@@ -2403,6 +2606,7 @@
 
         codec485();
         InitUI();
+        Handle.helper.map['启用图表']=true;
         bindpanel(Handle.helper,document.getElementById('参数设置面板'));
         if(navigator==null||navigator.serial==null){
             alert("不支持Web Serial");
@@ -2425,10 +2629,7 @@
         });
 
         let sendbtn=document.getElementById('com_open_btn');
-        COM=new COMHelper(null,
-        null,
-        null,
-        false);
+        
         
         let imgfile=async function(file) {
             if (!file) return;
