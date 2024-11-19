@@ -650,8 +650,7 @@
                     this.device = device;
                     device.addEventListener('gattserverdisconnected', (event) => {
                         //connectButton.textContent = '连接蓝牙设备';
-                        this.OnStatusChange(this,false);
-                        this.connected=false;
+                        this.close();
                     });
                     return this.device.gatt.connect();
                 })
@@ -698,7 +697,7 @@
                 .then(sender => {
                     this.log('> get Sender');
                     this.Sender = sender;
-                    this.OnStatusChange(this,true);
+                    this.OnStatusChange(true,this);
                     this.connected=true;
                     //connectButton.textContent = '断开蓝牙设备';
                 })
@@ -712,6 +711,10 @@
         }
         close(){
             try{
+                this.connected=false;
+                this.sendlist.length=0;
+                this.Sender=null;
+                this.OnStatusChange(false,this);
                 this.device.gatt.disconnect();
             }catch(error){
                 log(`error:${error.toString()}`);
@@ -1238,7 +1241,7 @@
         constructor(write,read,endkey='\n'){
             this.endchar=endkey.charCodeAt();
             this.startchars=['>'.charCodeAt()];
-            this.Delay=50;
+            this.Delay=200;
             this.mask=0xff;
             this.Entity=[];
             this.writecall=write?write:()=>{};
